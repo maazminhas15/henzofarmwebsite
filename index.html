@@ -730,6 +730,7 @@
             justify-content: center; gap: 10px;
         }
         .btn-submit:hover { background: var(--gold); color: var(--dark-green); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
         /* ===== FOOTER ===== */
         .footer {
@@ -1164,9 +1165,19 @@
             .navbar.scrolled { padding: 8px 20px; }
             .nav-links { display: none; }
             .mobile-menu-btn { display: block; }
-            .hero-title { font-size: 32px; }
-            .hero-content { padding: 120px 20px 60px; }
-            .hero-image img { height: 300px; }
+            .hero-title { font-size: 28px; margin-bottom: 12px; }
+            .hero-badge { margin-bottom: 14px; }
+            .hero-desc { margin-bottom: 22px; font-size: 15px; }
+            .hero-content { padding: 100px 20px 40px; }
+            .hero-image { display: none; }
+            /* Bigger tap targets everywhere on mobile — easier to hit while ordering on a phone */
+            .cart-item-qty button, .egg-option-qty button, .breed-price-row .btn-sm,
+            .cart-item-remove, .egg-modal-close, .cart-close, .checkout-close,
+            .lightbox-close, .mobile-nav-close {
+                width: 44px; height: 44px; font-size: 16px;
+                display: flex; align-items: center; justify-content: center;
+            }
+            .cart-item-qty, .egg-option-qty { gap: 10px; }
             .eggs-section { padding: 60px 20px; }
             .eggs-photos { grid-template-columns: 1fr; }
             .eggs-features { grid-template-columns: repeat(2, 1fr); }
@@ -1195,7 +1206,7 @@
             .section-title { font-size: 28px; }
             .cart-sidebar { max-width: 100%; }
             .cart-float-bar { 
-                left: 10px; right: 10px; transform: translateY(100px); 
+                left: 10px; right: 10px; bottom: 80px; transform: translateY(140px);
                 min-width: auto; width: calc(100% - 20px); border-radius: 16px;
             }
             .cart-float-bar.show { transform: translateY(0); }
@@ -1346,12 +1357,37 @@
             .campaign-body { padding: 22px; }
         }
     </style>
+<link rel="icon" type="image/png" href="images/logo.png">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "Henzo Farm",
+        "description": "Organic pasture-raised eggs and heritage poultry (Australorp, Rhode Island Red, Misri) delivered fresh across Islamabad & Rawalpindi.",
+        "url": "https://maazminhas15.github.io/henzofarm/",
+        "telephone": "+923115190548",
+        "email": "hello@henzofarm.com",
+        "priceRange": "Rs",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Shed NO.1, Minhas Street, Pindorian Shareef",
+            "addressLocality": "Islamabad",
+            "addressCountry": "PK"
+        },
+        "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+            "opens": "07:00",
+            "closes": "18:00"
+        }
+    }
+    </script>
 <base target="_blank">
 </head>
 <body>
 
     <!-- Toast -->
-    <div id="toast" class="toast">
+    <div id="toast" class="toast" role="status" aria-live="polite">
         <div class="toast-icon"><i class="fa-solid fa-check"></i></div>
         <span id="toast-msg">Added to cart</span>
     </div>
@@ -2174,12 +2210,18 @@
         // ==================== CONFIG ====================
         const CONFIG = {
             WHATSAPP: '923115190548',
-            GAS_URL: 'https://script.google.com/macros/s/AKfycbxaNDxplQWxsv9JN4flfgJW7A3oWZZs1OknQmm6Mz4QR98Ywf-AO6Pq5tpwGqIF5DZ9/exec',
+            SUPABASE_URL: 'https://dmmtsqndwtddtilgvuks.supabase.co',
+            SUPABASE_KEY: 'sb_publishable_bXA_32osMNSqXpQ3GRDyuw_-uD5FSOK',
             FREE_DELIVERY_MIN: 2000,   // free delivery at this subtotal and above
             DELIVERY_FEE: 200,         // flat fee below the threshold
             BREEDING_PAIR_DISCOUNT: 0.10, // 10% off breeding pairs — change here only
-            CHICK_PREORDER_DAYS: 7     // chicks ready ~1 week after order
+            CHICK_PREORDER_DAYS: 7,    // chicks ready ~1 week after order
+            SHEET_TIMEOUT: 8000,       // abort sheet save after 8s so checkout never hangs
+            PHONE_REGEX: /^(?:\+92|0)?3\d{9}$/  // Pakistani mobile numbers only
         };
+
+        // Single source of truth for egg pack sizes (dozens) — add a pack here once, it appears everywhere.
+        const EGG_PACKS = [1, 2, 4, 5];
 
         // ==================== PRODUCT DATA (single place to change prices) ====================
         // Change egg / meat prices HERE only — website + modal update automatically.
@@ -2219,7 +2261,8 @@
         }
 
         // ==================== STATE ====================
-        let cart = JSON.parse(localStorage.getItem('henzo_cart_v8')) || [];
+        let cart = [];
+        try { cart = JSON.parse(localStorage.getItem('henzo_cart_v8')) || []; } catch (e) { cart = []; }
 
         // Keep carts saved by the earlier meat modal usable after this update.
         cart = cart.map(function(item) {
@@ -2553,23 +2596,15 @@
             const delivery = deliveryFor(subtotal);
             const total = subtotal + delivery;
 
-            document.getElementById('checkoutItems').innerHTML = cart.map(item => 
-                '<div class="checkout-item"><span class="name">' + itemQuantityLabel(item) + ' ' + item.name + liveWeightDetails(item) + (item.pricingMode === 'estimated-live-weight' ? ' <span class="preorder-inline">· estimated</span>' : '') + (item.originalPrice ? ' <span style="color:#c9a227;font-size:12px">(10% OFF)</span>' : '') + (item.preorder ? ' <span class="preorder-inline">· pre-order</span>' : '') + '</span><span class="price">Rs ' + fmtRs(itemLineTotal(item)) + '</span></div>'
-            ).join('');
             const totalSavings = cart.reduce((a, i) => a + ((i.originalPrice || i.price) - i.price) * i.qty, 0);
+            const savingsRow = totalSavings > 0
+                ? '<div class="checkout-item" style="border-bottom:none;color:#c9a227;font-weight:700"><span class="name">🎉 You saved</span><span class="price" style="color:#c9a227">Rs ' + fmtRs(totalSavings) + '</span></div>'
+                : '';
+            const pairPct = Math.round(CONFIG.BREEDING_PAIR_DISCOUNT * 100);
+            document.getElementById('checkoutItems').innerHTML = cart.map(item => 
+                '<div class="checkout-item"><span class="name">' + itemQuantityLabel(item) + ' ' + item.name + liveWeightDetails(item) + (item.pricingMode === 'estimated-live-weight' ? ' <span class="preorder-inline">· estimated</span>' : '') + (item.originalPrice ? ' <span style="color:#c9a227;font-size:12px">(' + pairPct + '% OFF)</span>' : '') + (item.preorder ? ' <span class="preorder-inline">· pre-order</span>' : '') + '</span><span class="price">Rs ' + fmtRs(itemLineTotal(item)) + '</span></div>'
+            ).join('') + savingsRow;
             document.getElementById('checkoutTotal').innerText = 'Rs ' + fmtRs(total);
-
-            // Show savings if any
-            if (totalSavings > 0) {
-                const savingsDiv = document.createElement('div');
-                savingsDiv.className = 'cart-summary-row';
-                savingsDiv.innerHTML = '<span style="color:#c9a227">You Saved</span><span style="color:#c9a227;font-weight:700">Rs ' + totalSavings.toLocaleString() + '</span>';
-                savingsDiv.id = 'savingsRow';
-                const checkoutItems = document.getElementById('checkoutItems');
-                if (!document.getElementById('savingsRow')) {
-                    checkoutItems.appendChild(savingsDiv);
-                }
-            }
 
             document.getElementById('checkoutOverlay').classList.add('open');
             document.body.style.overflow = 'hidden';
@@ -2580,32 +2615,77 @@
             document.body.style.overflow = '';
         }
 
-        // ==================== GOOGLE SHEETS INTEGRATION ====================
-        async function saveToGoogleSheets(orderData) {
-            try {
-                const payload = {
-                    action: 'saveOrder',
-                    customer: orderData.customer,
-                    contact: orderData.contact,
-                    area: orderData.area,
-                    address: orderData.address || '',
-                    notes: orderData.notes || '',
-                    total: orderData.total,
-                    delivery: orderData.delivery,
-                    cart: orderData.cart
-                };
+        // ==================== SUPABASE INTEGRATION ====================
+        function supabaseHeaders(extra) {
+            return Object.assign({
+                'apikey': CONFIG.SUPABASE_KEY,
+                'Authorization': 'Bearer ' + CONFIG.SUPABASE_KEY,
+                'Content-Type': 'application/json'
+            }, extra || {});
+        }
 
-                const response = await fetch(CONFIG.GAS_URL, {
+        // Plain timeout race instead of AbortController — some embedded/preview
+        // environments proxy fetch through postMessage and can't clone an AbortSignal.
+        function withTimeout(promise, ms) {
+            return Promise.race([
+                promise,
+                new Promise(function(_, reject) {
+                    setTimeout(function() { reject(new Error('timeout')); }, ms);
+                })
+            ]);
+        }
+
+        async function supabaseInsert(table, row) {
+            try {
+                const response = await withTimeout(fetch(CONFIG.SUPABASE_URL + '/rest/v1/' + table, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                });
-                console.log('Order saved to Google Sheets');
-                return 'OK';
+                    headers: supabaseHeaders({ 'Prefer': 'return=minimal' }),
+                    body: JSON.stringify(row)
+                }), CONFIG.SHEET_TIMEOUT);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                console.log('Saved to Supabase:', table);
+                return true;
             } catch (err) {
-                console.log('GAS save failed:', err);
-                return 'OK';
+                console.log('Supabase insert failed (' + table + '):', err);
+                return false;   // caller decides what to do — checkout never blocks on this
             }
+        }
+
+        async function supabaseSelect(table, query) {
+            try {
+                const response = await withTimeout(fetch(CONFIG.SUPABASE_URL + '/rest/v1/' + table + (query || ''), {
+                    method: 'GET',
+                    headers: supabaseHeaders()
+                }), CONFIG.SHEET_TIMEOUT);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return await response.json();
+            } catch (err) {
+                console.log('Supabase read failed (' + table + '):', err);
+                return null;
+            }
+        }
+
+        function saveOrderToSheets(orderData) {
+            return supabaseInsert('orders', {
+                order_id: orderData.orderId,
+                customer: orderData.customer,
+                contact: orderData.contact,
+                area: orderData.area,
+                address: orderData.address || '',
+                notes: orderData.notes || '',
+                total: orderData.total,
+                delivery: orderData.delivery,
+                cart: orderData.cart
+            });
+        }
+
+        function saveInquiryToSheets(inquiry) {
+            return supabaseInsert('inquiries', {
+                customer: inquiry.customer,
+                contact: inquiry.contact,
+                interest: inquiry.interest,
+                message: inquiry.message || ''
+            });
         }
 
         function handleCheckout(e) {
@@ -2615,65 +2695,69 @@
                 return;
             }
 
-            const orderId = 'HZ-' + Date.now();
-
             const name = document.getElementById('custName').value.trim();
-            const phone = document.getElementById('custPhone').value.trim();
+            const phone = document.getElementById('custPhone').value.replace(/[\s\-()]/g, '');
             const area = document.getElementById('custArea').value.trim();
             const address = document.getElementById('custAddress').value.trim();
             const notes = document.getElementById('custNotes').value.trim();
 
+            // --- Validation: never let a bad phone number reach WhatsApp/sheets ---
+            if (!CONFIG.PHONE_REGEX.test(phone)) {
+                showToast('Enter a valid mobile number (03XXXXXXXXX)');
+                document.getElementById('custPhone').focus();
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;   // guard against double-taps / double orders
+
+            const orderId = 'HZ-' + Date.now();
             const subtotal = cartSubtotal();
             const delivery = deliveryFor(subtotal);
             const total = subtotal + delivery;
 
-            // Build WhatsApp message
-            let msg = '🌾 *HENZO FARM ORDER*%0A%0A';
-            msg += '*Customer:* ' + name + '%0A';
-            msg += '*Phone:* ' + phone + '%0A';
-            msg += '*Area:* ' + area + '%0A';
-            msg += '*Address:* ' + address + '%0A';
-            if (notes) msg += '*Notes:* ' + notes + '%0A';
-            msg += '%0A*Order Items:*%0A';
+            // --- Build WhatsApp message safely (encodeURIComponent handles all special chars) ---
+            const lines = ['🌾 *HENZO FARM ORDER*', ''];
+            lines.push('*Order ID:* ' + orderId);
+            lines.push('*Customer:* ' + name);
+            lines.push('*Phone:* ' + phone);
+            lines.push('*Area:* ' + area);
+            lines.push('*Address:* ' + address);
+            if (notes) lines.push('*Notes:* ' + notes);
+            lines.push('', '*Order Items:*');
 
             let hasPreorder = false;
             let preorderReady = '';
             cart.forEach(item => {
-                const discountNote = item.originalPrice ? ' (10% OFF, was Rs ' + (item.originalPrice * item.qty).toLocaleString() + ')' : '';
+                const discountNote = item.originalPrice ? ' (' + Math.round(CONFIG.BREEDING_PAIR_DISCOUNT * 100) + '% OFF, was Rs ' + fmtRs(item.originalPrice * item.qty) + ')' : '';
                 const preNote = item.preorder ? ' [PRE-ORDER]' : '';
                 if (item.preorder) { hasPreorder = true; preorderReady = item.readyDate; }
                 const liveNote = item.pricingMode === 'estimated-live-weight' ? ' — approx. ' + fmtRs(item.estimatedWeightKg) + ' kg total (final weight confirmed at delivery)' : '';
-                msg += '• ' + item.name + ' — ' + itemQuantityLabel(item) + liveNote + ' — Rs ' + fmtRs(itemLineTotal(item)) + discountNote + preNote + '%0A';
+                lines.push('• ' + item.name + ' — ' + itemQuantityLabel(item) + liveNote + ' — Rs ' + fmtRs(itemLineTotal(item)) + discountNote + preNote);
             });
 
-            msg += '%0A*Subtotal:* Rs ' + fmtRs(subtotal) + '%0A';
-            msg += '*Delivery:* ' + (delivery === 0 ? 'FREE' : 'Rs ' + delivery) + '%0A';
-            msg += '*Total:* Rs ' + fmtRs(total) + '%0A';
+            lines.push('', '*Subtotal:* Rs ' + fmtRs(subtotal));
+            lines.push('*Delivery:* ' + (delivery === 0 ? 'FREE' : 'Rs ' + delivery));
+            lines.push('*Total:* Rs ' + fmtRs(total));
             if (hasPreorder) {
-                msg += '%0A⏳ *Pre-order:* chick(s) ready in ~1 week (around ' + preorderReady + '). We will confirm the exact date.%0A';
+                lines.push('', '⏳ *Pre-order:* chick(s) ready in ~1 week (around ' + preorderReady + '). We will confirm the exact date.');
             }
-            msg += '%0AThank you for choosing Henzo Farm! 🐔🥚';
+            lines.push('', 'Thank you for choosing Henzo Farm! 🐔🥚');
 
-            const orderPayload = {
-                customer: name,
-                contact: phone,
-                area: area,
-                address: address,
-                notes: notes,
-                cart: cart,
-                total: total,
-                delivery: delivery,
-                orderId: orderId
-            };
-            saveToGoogleSheets(orderPayload);
+            // Save to sheet in the background — order goes through even if sheets are down
+            saveOrderToSheets({
+                customer: name, contact: phone, area: area, address: address,
+                notes: notes, cart: cart, total: total, delivery: delivery, orderId: orderId
+            });
 
-            window.open('https://wa.me/' + CONFIG.WHATSAPP + '?text=' + msg, '_blank');
+            window.open('https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(lines.join('\n')), '_blank');
 
             cart = [];
             saveCart();
             updateCartUI();
             updateFloatingBar();
             closeCheckout();
+            submitBtn.disabled = false;
 
             showSuccessModal(orderId);
         }
@@ -2683,18 +2767,27 @@
             e.preventDefault();
 
             const name = document.getElementById('contactName').value.trim();
-            const phone = document.getElementById('contactPhone').value.trim();
+            const phone = document.getElementById('contactPhone').value.replace(/[\s\-()]/g, '');
             const interest = document.getElementById('contactInterest').value;
             const message = document.getElementById('contactMessage').value.trim();
 
-            let msg = '🌾 *HENZO FARM INQUIRY*%0A%0A';
-            msg += '*Name:* ' + name + '%0A';
-            msg += '*Phone:* ' + phone + '%0A';
-            msg += '*Interested In:* ' + interest + '%0A';
-            if (message) msg += '*Message:* ' + message + '%0A';
-            msg += '%0APlease get back to me. Thank you! 🐔';
+            if (!CONFIG.PHONE_REGEX.test(phone)) {
+                showToast('Enter a valid mobile number (03XXXXXXXXX)');
+                document.getElementById('contactPhone').focus();
+                return;
+            }
 
-            window.open('https://wa.me/' + CONFIG.WHATSAPP + '?text=' + msg, '_blank');
+            // Log the inquiry in the sheet so no lead is lost in chat history
+            saveInquiryToSheets({ customer: name, contact: phone, interest: interest, message: message });
+
+            const lines = ['🌾 *HENZO FARM INQUIRY*', ''];
+            lines.push('*Name:* ' + name);
+            lines.push('*Phone:* ' + phone);
+            lines.push('*Interested In:* ' + interest);
+            if (message) lines.push('*Message:* ' + message);
+            lines.push('', 'Please get back to me. Thank you! 🐔');
+
+            window.open('https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(lines.join('\n')), '_blank');
 
             document.getElementById('contactForm').reset();
             showToast('Message sent via WhatsApp!');
@@ -2754,7 +2847,7 @@
         function renderEggsGrid() {
             const grid = document.getElementById('eggsGrid');
             if (!grid) return;
-            grid.innerHTML = [1, 2, 4, 5].map(function(d) {
+            grid.innerHTML = EGG_PACKS.map(function(d) {
                 const p = eggPriceWithDiscount(d);
                 const popular = (d === 5);
                 const perEgg = +(p.final / (d * 12)).toFixed(2);
@@ -2774,7 +2867,7 @@
         function renderEggModalOptions() {
             const box = document.getElementById('eggModalOptions');
             if (!box) return;
-            box.innerHTML = [1, 2, 4, 5].map(function(d) {
+            box.innerHTML = EGG_PACKS.map(function(d) {
                 const p = eggPriceWithDiscount(d);
                 const popular = (d === 5);
                 return '<div class="egg-option' + (popular ? ' popular' : '') + '" data-name="' + eggLabel(d) + ' Eggs (' + (d * 12) + ')" data-price="' + p.final + '">' +
@@ -2796,11 +2889,13 @@
         }
 
         function renderBestValue() {
-            const p = eggPriceWithDiscount(5);
+            const best = Math.max.apply(null, EGG_PACKS);
+            const p = eggPriceWithDiscount(best);
+            const eggsInPack = best * 12;
             const t = document.getElementById('bestValueTitle');
             const e = document.getElementById('bestValuePerEgg');
-            if (t) t.innerText = '5 Dozen Pack — Rs. ' + fmtRs(p.final);
-            if (e) e.innerText = 'Save Rs. ' + fmtRs(+(p.base - p.final).toFixed(2)) + ' · only Rs. ' + fmtRs(+(p.final / 60).toFixed(2)) + ' per egg';
+            if (t) t.innerText = best + ' Dozen Pack — Rs. ' + fmtRs(p.final);
+            if (e) e.innerText = 'Save Rs. ' + fmtRs(+(p.base - p.final).toFixed(2)) + ' · only Rs. ' + fmtRs(+(p.final / eggsInPack).toFixed(2)) + ' per egg';
         }
 
         // ==================== FRESH MEAT MODAL ====================
@@ -2946,13 +3041,13 @@
             renderMeatOptions();
         }
         async function loadSettings() {
-            try {
-                const res = await fetch(CONFIG.GAS_URL + '?action=getSettings');
-                const s = await res.json();
-                if (s && s.eggsBasePrice) PRODUCTS.eggs.basePrice = +s.eggsBasePrice;
-                if (s && s.meat && s.meat.live) PRODUCTS.meat[0].price = +s.meat.live;
-                if (s && s.meat && s.meat.whole) PRODUCTS.meat[1].price = +s.meat.whole;
-            } catch (err) { /* offline or old backend — keep default prices */ }
+            const rows = await supabaseSelect('settings', '?id=eq.1&select=*');
+            const s = rows && rows[0];
+            if (s) {
+                if (s.eggs_base_price) PRODUCTS.eggs.basePrice = +s.eggs_base_price;
+                if (s.meat_live) PRODUCTS.meat[0].price = +s.meat_live;
+                if (s.meat_whole) PRODUCTS.meat[1].price = +s.meat_whole;
+            } // null/failed fetch — keep default prices
             renderAllProducts();
         }
 
@@ -2960,14 +3055,16 @@
         let campaignTimer = null;
 
         async function loadCampaigns() {
-            let campaigns = [];
-            try {
-                const res = await fetch(CONFIG.GAS_URL + '?action=getCampaigns');
-                const data = await res.json();
-                campaigns = data.campaigns || [];
-            } catch (err) {
-                try { campaigns = JSON.parse(localStorage.getItem('henzo_campaigns') || '[]'); } catch (e) { campaigns = []; }
-            }
+            const rows = await supabaseSelect('campaigns', '?select=*');
+            const campaigns = (rows || []).map(function(c) {
+                return Object.assign({}, c, {
+                    startDate: c.start_date,
+                    endDate: c.end_date,
+                    buttonText: c.button_text,
+                    buttonAction: c.button_action,
+                    imageUrl: c.image_url
+                });
+            });
             renderCampaign(campaigns);
         }
 
@@ -3153,4 +3250,4 @@
         </div>
     </div>
 
-</body>
+</body></html>
