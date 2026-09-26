@@ -1104,11 +1104,21 @@
             .egg-modal-options { padding: 0 20px; }
             .egg-modal-footer { flex-direction: column; padding: 20px; }
             .btn-add-cart-lg { width: 100%; justify-content: center; }
-            .egg-option { flex-wrap: wrap; }
-            .meat-product-image { width: 50px; height: 50px; flex-basis: 50px; }
-            .egg-option-info { min-width: min(100%, 180px); }
+            .egg-option {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                grid-template-areas: "info info" "price qty";
+                row-gap: 12px; column-gap: 12px;
+            }
+            .egg-option.has-media {
+                grid-template-columns: 50px 1fr auto;
+                grid-template-areas: "image info info" "price price qty";
+            }
+            .meat-product-image { grid-area: image; width: 50px; height: 50px; }
+            .egg-option-info { grid-area: info; min-width: 0; }
             .live-weight-picker select { max-width: 100%; }
-            .egg-option-qty { margin-left: auto; }
+            .egg-option-price { grid-area: price; text-align: left; min-width: 0; }
+            .egg-option-qty { grid-area: qty; justify-self: end; margin-left: 0; }
         }
 
         /* ===== PRE-ORDER (CHICKS) ===== */
@@ -2927,7 +2937,7 @@
                         m.weightOptions.map(function(weight) { return '<option value="' + weight + '"' + (weight === m.defaultWeightKg ? ' selected' : '') + '>About ' + weight + ' kg</option>'; }).join('') +
                       '</select></label>'
                     : '';
-                return '<div class="egg-option" data-meat="' + i + '">' +
+                return '<div class="egg-option has-media" data-meat="' + i + '">' +
                     '<div class="meat-product-image"><img src="' + m.image + '" alt="' + m.alt + '" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML=\'' + m.emoji + '\'"></div>' +
                     '<div class="egg-option-info">' +
                         '<div class="egg-option-title">' + m.name + '</div>' +
