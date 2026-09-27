@@ -1553,6 +1553,30 @@
 
         /* ===== PREMIUM SUCCESS MODAL GRADIENT ===== */
         .success-circle { background: linear-gradient(135deg, #2d5a27 0%, #4a8f3f 50%, #2d5a27 100%); }
+
+        /* ===== DELIVERY THRESHOLD TOOLTIP ===== */
+        .delivery-info {
+            position: relative; display: inline-flex; align-items: center;
+            margin-left: 6px; cursor: help;
+        }
+        .delivery-info i { color: var(--gold); font-size: 13px; }
+        .delivery-info .delivery-tooltip {
+            position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
+            background: var(--dark-green-deep); color: var(--white);
+            padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            white-space: nowrap; opacity: 0; pointer-events: none;
+            transition: opacity 0.2s; box-shadow: var(--shadow-md); z-index: 20;
+        }
+        .delivery-info .delivery-tooltip::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 5px solid transparent; border-top-color: var(--dark-green-deep);
+        }
+        .delivery-info:hover .delivery-tooltip,
+        .delivery-info:focus .delivery-tooltip { opacity: 1; }
+        @media (max-width: 480px) {
+            .delivery-info .delivery-tooltip { white-space: normal; width: 200px; left: auto; right: -10px; transform: none; }
+            .delivery-info .delivery-tooltip::after { left: auto; right: 16px; transform: none; }
+        }
     </style>
 <link rel="icon" type="image/png" href="images/logo.png">
     <script type="application/ld+json">
@@ -1625,7 +1649,12 @@
         <div class="cart-items" id="cartItems"></div>
         <div class="cart-footer">
             <div class="cart-summary-row"><span>Subtotal</span><span id="cartSubtotal">Rs 0</span></div>
-            <div class="cart-summary-row"><span>Delivery</span><span id="cartDelivery">Rs 0</span></div>
+            <div class="cart-summary-row"><span>Delivery
+                <span class="delivery-info" tabindex="0" aria-label="Delivery fee info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span class="delivery-tooltip">Free delivery at PKR 1,499+, otherwise delivery charges apply as mentioned</span>
+                </span>
+            </span><span id="cartDelivery">Rs 0</span></div>
             <div class="cart-summary-row total"><span>Total</span><span class="price" id="cartTotal">Rs 0</span></div>
             <button class="btn-checkout" onclick="openCheckout()">
                 Proceed to Checkout <i class="fa-solid fa-arrow-right"></i>
@@ -1776,7 +1805,13 @@
     <!-- Trust Bar -->
     <div class="trust-bar">
         <div class="trust-bar-item"><i class="fa-solid fa-shield-halved"></i> 100% Farm Fresh</div>
-        <div class="trust-bar-item"><i class="fa-solid fa-truck-fast"></i> Same-Day Delivery</div>
+        <div class="trust-bar-item">
+            <i class="fa-solid fa-truck-fast"></i> Same-Day Delivery
+            <span class="delivery-info" tabindex="0" aria-label="Delivery fee info">
+                <i class="fa-solid fa-circle-info"></i>
+                <span class="delivery-tooltip">Free delivery at PKR 1,499+, otherwise delivery charges apply as mentioned</span>
+            </span>
+        </div>
         <div class="trust-bar-item"><i class="fa-solid fa-syringe"></i> Vaccinated Birds</div>
         <div class="trust-bar-item"><i class="fa-solid fa-money-bill-wave"></i> Cash on Delivery</div>
     </div>
@@ -2259,7 +2294,7 @@
             </div>
             <div class="faq-answer">
                 <div class="faq-answer-inner">
-                    Yes! We deliver to all sectors of Islamabad, Bahria Town, DHA, Gulberg Greens, PWD, and all areas of Rawalpindi including Saddar, Satellite Town, Adiala Road, and Westridge. Free delivery on orders of Rs 2,000 and above.
+                    Yes! We deliver to all sectors of Islamabad, Bahria Town, DHA, Gulberg Greens, PWD, and all areas of Rawalpindi including Saddar, Satellite Town, Adiala Road, and Westridge. Free delivery on orders of Rs 1,499 and above.
                 </div>
             </div>
         </div>
@@ -2498,7 +2533,7 @@
             WHATSAPP: '923115190548',
             SUPABASE_URL: 'https://dmmtsqndwtddtilgvuks.supabase.co',
             SUPABASE_KEY: 'sb_publishable_bXA_32osMNSqXpQ3GRDyuw_-uD5FSOK',
-            FREE_DELIVERY_MIN: 2000,   // free delivery at this subtotal and above
+            FREE_DELIVERY_MIN: 1499,   // free delivery at this subtotal and above
             DELIVERY_FEE: 200,         // flat fee below the threshold
             BREEDING_PAIR_DISCOUNT: 0.10, // 10% off breeding pairs — change here only
             CHICK_PREORDER_DAYS: 7,    // chicks ready ~1 week after order
