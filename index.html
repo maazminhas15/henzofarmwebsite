@@ -39,6 +39,7 @@
             --dark-green-deep: #1e3d1a;
             --gold: #c9a227;
             --gold-light: #e8c84a;
+            --gold-text: #8a6d14;
             --cream: #faf9f6;
             --cream-dark: #f0ede8;
             --text: #1a1a1a;
@@ -64,7 +65,8 @@
             overflow-x: hidden;
             line-height: 1.6;
         }
-        h1, h2, h3, h4, h5, h6 { font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: -0.01em; }
+        h1, h2 { font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: -0.01em; }
+        h3, h4, h5, h6 { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.01em; }
         .section-label, .nav-link, .btn-add-cart, .btn-checkout, .btn-submit { letter-spacing: 0.03em; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--cream); }
@@ -176,7 +178,7 @@
         .hero {
             min-height: 100vh; position: relative;
             display: flex; align-items: center;
-            background: linear-gradient(135deg, var(--dark-green) 0%, var(--dark-green-deep) 100%);
+            background: linear-gradient(135deg, #3f5f34 0%, #2e2412 100%);
             overflow: hidden;
         }
         .hero-bg {
@@ -201,25 +203,6 @@
             border: 1px solid rgba(201,162,39,0.3); border-radius: 99px;
             font-size: 13px; font-weight: 600; color: var(--gold-light);
             margin-bottom: 24px; position: relative;
-            animation: badgePulse 2.5s ease-in-out infinite;
-        }
-        @keyframes badgePulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(201,162,39,0.35); }
-            50% { box-shadow: 0 0 0 6px rgba(201,162,39,0); }
-        }
-        /* Floating decorative elements in hero */
-        .hero-float {
-            position: absolute; border-radius: 50%;
-            background: radial-gradient(circle, rgba(201,162,39,0.25), transparent 70%);
-            pointer-events: none; z-index: 1;
-            animation: floatDrift 8s ease-in-out infinite;
-        }
-        .hero-float.f1 { width: 140px; height: 140px; top: 10%; left: 4%; animation-delay: 0s; }
-        .hero-float.f2 { width: 90px; height: 90px; bottom: 15%; left: 14%; animation-delay: 1.5s; }
-        .hero-float.f3 { width: 180px; height: 180px; top: 8%; right: 6%; animation-delay: 3s; }
-        @keyframes floatDrift {
-            0%, 100% { transform: translateY(0) translateX(0); }
-            50% { transform: translateY(-20px) translateX(10px); }
         }
         .hero-title {
             font-size: 56px; font-weight: 800; color: var(--white);
@@ -243,14 +226,6 @@
             cursor: pointer; transition: all 0.3s; text-decoration: none;
             position: relative; overflow: hidden;
         }
-        .btn-primary::after {
-            content: ''; position: absolute; top: 0; left: -75%;
-            width: 50%; height: 100%;
-            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.5), transparent);
-            transform: skewX(-20deg);
-            transition: left 0.6s ease;
-        }
-        .btn-primary:hover::after { left: 130%; }
         .btn-primary:hover {
             transform: translateY(-2px) scale(1.02);
             box-shadow: 0 10px 28px rgba(201,162,39,0.4);
@@ -280,7 +255,7 @@
         }
         .section-label {
             display: inline-flex; align-items: center; gap: 8px;
-            font-size: 13px; font-weight: 700; color: var(--gold);
+            font-size: 13px; font-weight: 700; color: var(--gold-text);
             text-transform: uppercase; letter-spacing: 0.1em;
             margin-bottom: 12px;
         }
@@ -487,8 +462,7 @@
             letter-spacing: 0.05em;
         }
         .breed-badge.record { background: var(--gold); color: var(--dark-green-deep); }
-        .breed-badge.heritage { background: #c0392b; color: var(--white); }
-        .breed-badge.heat { background: #2980b9; color: var(--white); }
+        .breed-badge.heritage, .breed-badge.heat { background: var(--dark-green); color: var(--white); }
         .breed-info { padding: 28px; }
         .breed-name {
             font-family: 'Playfair Display', serif; font-size: 24px;
@@ -507,6 +481,18 @@
             color: var(--dark-green);
         }
         .breed-prices { display: flex; flex-direction: column; gap: 10px; }
+        .breed-compact-footer {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 4px; gap: 12px;
+        }
+        .breed-from-price { font-size: 17px; font-weight: 800; color: var(--dark-green); }
+        .btn-view-options {
+            padding: 12px 20px; background: var(--dark-green); color: var(--white);
+            border: none; border-radius: 10px; font-weight: 700; font-size: 13px;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.2s; white-space: nowrap;
+        }
+        .btn-view-options:hover { background: var(--gold); color: var(--dark-green); }
         .breed-price-row {
             display: flex; align-items: center; justify-content: space-between;
             padding: 10px 14px; background: var(--white);
@@ -1233,7 +1219,8 @@
             .hero-badge { margin-bottom: 14px; }
             .hero-desc { margin-bottom: 22px; font-size: 15px; }
             .hero-content { padding: 100px 20px 40px; }
-            .hero-image { display: none; }
+            .hero-image { max-width: 100%; margin-top: 8px; }
+            .hero-image img { height: 220px; }
             /* Bigger tap targets everywhere on mobile — easier to hit while ordering on a phone */
             .cart-item-qty button, .egg-option-qty button, .breed-price-row .btn-sm,
             .cart-item-remove, .egg-modal-close, .cart-close, .checkout-close,
@@ -1260,6 +1247,7 @@
             .gallery-grid { grid-template-columns: 1fr; }
             .gallery-item.wide { grid-column: span 1; }
             .gallery-item.tall { grid-row: span 1; }
+            .gallery-caption { opacity: 1; background: linear-gradient(transparent, rgba(0,0,0,0.75)); }
             .testimonials-section { padding: 60px 20px; }
             .testimonials-grid { grid-template-columns: 1fr; }
             .contact-section { padding: 60px 20px; }
@@ -1383,10 +1371,19 @@
             padding: 3px 10px; border-radius: 99px; margin-left: 6px;
         }
         .egg-package .per-egg { font-size: 12px; color: var(--text-light); margin-bottom: 18px; }
+        .egg-package-img { width: 100%; height: 110px; object-fit: cover; border-radius: 12px; margin-bottom: 14px; }
 
         /* image placeholders reduce layout shift while loading */
         .breed-image img, .gallery-item img, .eggs-photo-side img,
         .eggs-photo-main img, .hero-image img, .about-image img { background: #e8e4dc; }
+
+        /* unified photo grade so every farm photo feels like one shoot */
+        .hero-bg img, .hero-image img, .eggs-photo-main img, .eggs-photo-side img,
+        .breed-image img, .gallery-item img, .about-image img,
+        .fresh-meat-card-image img, .fresh-meat-intro-image img,
+        .egg-package-img, .meat-product-image img {
+            filter: saturate(1.05) contrast(1.03);
+        }
 
         /* ===== CAMPAIGN BANNER (renders ONLY when an active campaign exists) ===== */
         #campaignSlot:empty { display: none; }
@@ -1554,6 +1551,37 @@
         /* ===== PREMIUM SUCCESS MODAL GRADIENT ===== */
         .success-circle { background: linear-gradient(135deg, #2d5a27 0%, #4a8f3f 50%, #2d5a27 100%); }
 
+        /* ===== EGG CARD IMAGE ===== */
+        .egg-package-img { width: 100%; height: 110px; object-fit: cover; border-radius: 12px; margin-bottom: 14px; background: #e8e4dc; }
+
+        /* ===== COMPACT BREED CARDS ===== */
+        .breed-compact-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; }
+        .breed-from-price { font-size: 18px; font-weight: 800; color: var(--dark-green); }
+        .breed-from-price small { display: block; font-size: 11px; font-weight: 600; color: var(--text-light); }
+        .btn-view-options {
+            padding: 14px 22px; min-height: 48px; background: var(--dark-green); color: var(--white);
+            border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s; font-family: inherit;
+        }
+        .btn-view-options:hover { background: var(--gold); color: var(--dark-green); }
+
+        /* ===== GUARANTEE STRIP (replaces the big Guarantees section) ===== */
+        .guarantee-strip { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; padding: 32px 20px 0; max-width: 1200px; margin: 0 auto; }
+        .guarantee-strip span {
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
+            background: var(--white); border: 1px solid var(--cream-dark); border-radius: 99px;
+            font-size: 13px; font-weight: 700; color: var(--dark-green); box-shadow: var(--shadow-sm);
+        }
+        .guarantee-strip i { color: var(--gold-text); }
+
+        /* ===== TRUST BAR STATS ===== */
+        .trust-bar-item .counter { color: var(--gold-light); font-weight: 800; }
+        .trust-bar-sep { width: 1px; background: rgba(255,255,255,0.2); }
+        @media (max-width: 768px) { .trust-bar-sep { display: none; } }
+
+        /* ===== PRICE LOADING STATE ===== */
+        .is-loading { opacity: 0.35; filter: blur(3px); pointer-events: none; transition: opacity 0.25s, filter 0.25s; min-height: 220px; }
+
         /* ===== DELIVERY THRESHOLD TOOLTIP ===== */
         .delivery-info {
             position: relative; display: inline-flex; align-items: center;
@@ -1632,10 +1660,9 @@
         <a href="#eggs" class="mobile-nav-link" onclick="closeMobileNav()">Fresh Eggs</a>
         <a href="#fresh-meat" class="mobile-nav-link">Fresh Meat</a>
         <a href="#breeds" class="mobile-nav-link" onclick="closeMobileNav()">Our Breeds</a>
-        <a href="#process" class="mobile-nav-link" onclick="closeMobileNav()">Our Process</a>
+        <a href="#about" class="mobile-nav-link" onclick="closeMobileNav()">About</a>
         <a href="#gallery" class="mobile-nav-link" onclick="closeMobileNav()">Gallery</a>
         <a href="#faq" class="mobile-nav-link" onclick="closeMobileNav()">FAQ</a>
-        <a href="#about" class="mobile-nav-link" onclick="closeMobileNav()">About</a>
         <a href="#contact" class="mobile-nav-link" onclick="closeMobileNav()">Contact</a>
     </div>
 
@@ -1652,7 +1679,7 @@
             <div class="cart-summary-row"><span>Delivery
                 <span class="delivery-info" tabindex="0" aria-label="Delivery fee info">
                     <i class="fa-solid fa-circle-info"></i>
-                    <span class="delivery-tooltip">Free delivery at PKR 1,499+, otherwise delivery charges apply as mentioned</span>
+                    <span class="delivery-tooltip">Free delivery on orders above Rs. 1,499. Below that, a flat Rs. 200 delivery charge applies.</span>
                 </span>
             </span><span id="cartDelivery">Rs 0</span></div>
             <div class="cart-summary-row total"><span>Total</span><span class="price" id="cartTotal">Rs 0</span></div>
@@ -1674,6 +1701,13 @@
             </div>
 
             <div class="checkout-items" id="checkoutItems"></div>
+            <div class="cart-summary-row" style="font-size:14px;margin-top:8px;"><span>Subtotal</span><span id="checkoutSubtotal">Rs 0</span></div>
+            <div class="cart-summary-row"><span>Delivery
+                <span class="delivery-info" tabindex="0" aria-label="Delivery fee info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span class="delivery-tooltip">Free delivery on orders above Rs. 1,499. Below that, a flat Rs. 200 delivery charge applies.</span>
+                </span>
+            </span><span id="checkoutDelivery">Rs 0</span></div>
             <div class="checkout-total">
                 <span>Total</span>
                 <span class="price" id="checkoutTotal">Rs 0</span>
@@ -1748,10 +1782,9 @@
             <a href="#eggs" class="nav-link">Fresh Eggs</a>
             <a href="#fresh-meat" class="nav-link">Fresh Meat</a>
             <a href="#breeds" class="nav-link">Our Breeds</a>
-            <a href="#process" class="nav-link">Process</a>
+                        <a href="#about" class="nav-link">About</a>
             <a href="#gallery" class="nav-link">Gallery</a>
             <a href="#faq" class="nav-link">FAQ</a>
-            <a href="#about" class="nav-link">About</a>
             <a href="#contact" class="nav-link">Contact</a>
         </div>
         <div style="display:flex;align-items:center;gap:16px;">
@@ -1774,9 +1807,6 @@
             <img src="images/hero_chickens.jpg" alt="Henzo Farm" fetchpriority="high" decoding="async" onerror="this.style.display='none'">
         </div>
         <div class="hero-pattern"></div>
-        <div class="hero-float f1"></div>
-        <div class="hero-float f2"></div>
-        <div class="hero-float f3"></div>
         <div class="hero-content">
             <div data-reveal="fade-up">
                 <div class="hero-badge">
@@ -1802,73 +1832,21 @@
         </div>
     </section>
 
-    <!-- Trust Bar -->
+    <!-- Trust Bar (with social proof merged in) -->
     <div class="trust-bar">
         <div class="trust-bar-item"><i class="fa-solid fa-shield-halved"></i> 100% Farm Fresh</div>
         <div class="trust-bar-item">
             <i class="fa-solid fa-truck-fast"></i> Same-Day Delivery
             <span class="delivery-info" tabindex="0" aria-label="Delivery fee info">
                 <i class="fa-solid fa-circle-info"></i>
-                <span class="delivery-tooltip">Free delivery at PKR 1,499+, otherwise delivery charges apply as mentioned</span>
+                <span class="delivery-tooltip">Free delivery on orders above Rs. 1,499. Below that, a flat Rs. 200 delivery charge applies.</span>
             </span>
         </div>
-        <div class="trust-bar-item"><i class="fa-solid fa-syringe"></i> Vaccinated Birds</div>
         <div class="trust-bar-item"><i class="fa-solid fa-money-bill-wave"></i> Cash on Delivery</div>
+        <div class="trust-bar-sep"></div>
+        <div class="trust-bar-item"><span><span class="counter" data-target="500">0</span>+ customers</span></div>
+        <div class="trust-bar-item"><span><span class="counter" data-target="4.9" data-decimal="1">0</span>★ rating</span></div>
     </div>
-
-    <!-- Stats Section -->
-    <section class="stats-section">
-        <div class="stats-grid">
-            <div data-reveal="fade-up">
-                <div class="stat-number"><span class="counter" data-target="500">0</span><span class="suffix">+</span></div>
-                <div class="stat-label">Happy Customers</div>
-            </div>
-            <div data-reveal="fade-up" style="transition-delay:0.1s;">
-                <div class="stat-number"><span class="counter" data-target="2000">0</span><span class="suffix">+</span></div>
-                <div class="stat-label">Orders Delivered</div>
-            </div>
-            <div data-reveal="fade-up" style="transition-delay:0.2s;">
-                <div class="stat-number"><span class="counter" data-target="4.9" data-decimal="1">0</span><span class="suffix">★</span></div>
-                <div class="stat-label">Average Rating</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How to Order Section -->
-    <section class="how-to-order-section" id="how-to-order">
-        <div class="how-to-order-container">
-            <div class="section-header">
-                <div class="section-label"><i class="fa-solid fa-list-ol"></i> Simple Process</div>
-                <h2 class="section-title">How to Order</h2>
-                <p class="section-subtitle">Get farm-fresh products delivered in 4 easy steps</p>
-            </div>
-            <div class="steps-grid">
-                <div class="step-card">
-                    <div class="step-number">1</div>
-                    <h4>Browse Products</h4>
-                    <p>Select eggs, chicks, hens, or breeding pairs from our collection</p>
-                    <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">2</div>
-                    <h4>Add to Cart</h4>
-                    <p>Choose quantities and categories that fit your needs</p>
-                    <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">3</div>
-                    <h4>Enter Details</h4>
-                    <p>Fill your name, phone, delivery area and full address</p>
-                    <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">4</div>
-                    <h4>Confirm on WhatsApp</h4>
-                    <p>We confirm your order and schedule delivery time</p>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Eggs Section -->
     <section class="eggs-section" id="eggs">
@@ -1963,214 +1941,29 @@
             </div>
 
             <div class="breeds-grid" id="breedsGrid">
-                <!-- Black Australorp -->
-                <div class="breed-card">
-                    <div class="breed-image">
-                        <img loading="lazy" decoding="async" src="images/australorp_hen.jpg" alt="Black Australorp" onerror="this.style.display='none'">
-                        <span class="breed-badge record">Record Layer</span>
-                    </div>
-                    <div class="breed-info">
-                        <h3 class="breed-name">Black Australorp</h3>
-                        <p class="breed-desc">World-record egg layer with gentle temperament. Beautiful jet-black plumage with beetle-green sheen.</p>
-                        <div class="breed-tags">
-                            <span class="breed-tag">250+ eggs/year</span>
-                            <span class="breed-tag">Jet Black</span>
-                            <span class="breed-tag">Gentle nature</span>
-                        </div>
-                        <div class="breed-prices">
-                            <div class="breed-price-row">
-                                <span class="label">Day-Old Chick <span class="preorder-tag"><i class="fa-solid fa-clock"></i> Pre-order</span></span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <span class="price">Rs. 130</span>
-                                    <button class="btn-sm" onclick="addToCart('Australorp Day-Old Chick', 130)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                            <div class="breed-price-row">
-                                <span class="label">Mature Hen</span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <span class="price">Rs. 2,500</span>
-                                    <button class="btn-sm" onclick="addToCart('Australorp Mature Hen', 2500)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                            <div class="breed-price-row">
-                                <span class="label">Breeding Rooster</span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <span class="price">Rs. 3,000</span>
-                                    <button class="btn-sm" onclick="addToCart('Australorp Breeding Rooster', 3000)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                            <div class="breed-price-row">
-                                <span class="label">Breeding Pair (1 Rooster + 5 Hens)</span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <div>
-                                        <span class="pair-price" data-original="15500"></span>
-                                    </div>
-                                    <button class="btn-sm" onclick="addToCart('Australorp Breeding Pair (1 Rooster + 5 Hens)', 15500)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Rhode Island Red -->
-                <div class="breed-card">
-                    <div class="breed-image">
-                        <img loading="lazy" decoding="async" src="images/rir_rooster.jpg" alt="Rhode Island Red" onerror="this.style.display='none'">
-                        <span class="breed-badge heritage">Heritage Classic</span>
-                    </div>
-                    <div class="breed-info">
-                        <h3 class="breed-name">Rhode Island Red</h3>
-                        <p class="breed-desc">America's heritage dual-purpose breed. Hardy, productive, and stunning rich mahogany plumage.</p>
-                        <div class="breed-tags">
-                            <span class="breed-tag">280+ eggs/year</span>
-                            <span class="breed-tag">Rich Mahogany</span>
-                            <span class="breed-tag">Hardy</span>
-                        </div>
-                        <div class="breed-prices">
-                            <div class="breed-price-row">
-                                <span class="label">Day-Old Chick <span class="preorder-tag"><i class="fa-solid fa-clock"></i> Pre-order</span></span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <span class="price">Rs. 130</span>
-                                    <button class="btn-sm" onclick="addToCart('RIR Day-Old Chick', 130)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                            <div class="breed-price-row">
-                                <span class="label">Mature Hen</span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <span class="price">Rs. 2,500</span>
-                                    <button class="btn-sm" onclick="addToCart('RIR Mature Hen', 2500)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                            <div class="breed-price-row">
-                                <span class="label">Breeding Rooster</span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <span class="price">Rs. 3,000</span>
-                                    <button class="btn-sm" onclick="addToCart('RIR Breeding Rooster', 3000)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                            <div class="breed-price-row">
-                                <span class="label">Breeding Pair (1 Rooster + 5 Hens)</span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <div>
-                                        <span class="pair-price" data-original="15500"></span>
-                                    </div>
-                                    <button class="btn-sm" onclick="addToCart('RIR Breeding Pair (1 Rooster + 5 Hens)', 15500)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Misri (Fayoumi) -->
-                <div class="breed-card">
-                    <div class="breed-image">
-                        <img loading="lazy" decoding="async" src="images/fayoumi_chick.jpg" alt="Misri Fayoumi" onerror="this.style.display='none'">
-                        <span class="breed-badge heat">Heat Hardy</span>
-                    </div>
-                    <div class="breed-info">
-                        <h3 class="breed-name">Misri (Fayoumi)</h3>
-                        <p class="breed-desc">Ancient Egyptian breed perfect for Pakistani climate. Exceptional heat tolerance with beautiful silver penciled plumage.</p>
-                        <div class="breed-tags">
-                            <span class="breed-tag">200+ eggs/year</span>
-                            <span class="breed-tag">Silver Penciled</span>
-                            <span class="breed-tag">Heat tolerant</span>
-                        </div>
-                        <div class="breed-prices">
-                            <div class="breed-price-row">
-                                <span class="label">Day-Old Chick <span class="preorder-tag"><i class="fa-solid fa-clock"></i> Pre-order</span></span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <span class="price">Rs. 70</span>
-                                    <button class="btn-sm" onclick="addToCart('Misri Day-Old Chick', 70)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                            <div class="breed-price-row">
-                                <span class="label">Mature Hen</span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <span class="price">Rs. 2,200</span>
-                                    <button class="btn-sm" onclick="addToCart('Misri Mature Hen', 2200)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                            <div class="breed-price-row">
-                                <span class="label">Breeding Rooster</span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <span class="price">Rs. 2,500</span>
-                                    <button class="btn-sm" onclick="addToCart('Misri Breeding Rooster', 2500)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                            <div class="breed-price-row">
-                                <span class="label">Breeding Pair (1 Rooster + 5 Hens)</span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <div>
-                                        <span class="pair-price" data-original="13500"></span>
-                                    </div>
-                                    <button class="btn-sm" onclick="addToCart('Misri Breeding Pair (1 Rooster + 5 Hens)', 13500)"><i class="fa-solid fa-plus"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
 
-    <!-- Process Section -->
-    <section class="process-section" id="process">
-        <div class="section-header">
-            <div class="section-label"><i class="fa-solid fa-clock-rotate-left"></i> Our Process</div>
-            <h2 class="section-title">From Farm to Table</h2>
-            <p class="section-subtitle">Every step ensures the highest quality for you</p>
-        </div>
+    <!-- Guarantees (condensed) -->
+    <div class="guarantee-strip" data-reveal="fade-up">
+        <span><i class="fa-solid fa-leaf"></i> 100% Organic Feed</span>
+        <span><i class="fa-solid fa-syringe"></i> Vaccinated Stock</span>
+        <span><i class="fa-solid fa-rotate-left"></i> Freshness Promise</span>
+    </div>
 
-        <div class="process-grid">
-            <div class="process-step">
-                <div class="process-icon">🌿</div>
-                <h4>Pasture Raised</h4>
-                <p>Our hens roam freely on open green pastures all day long</p>
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="about-container">
+            <div class="about-content" data-reveal="slide-left">
+                <h2>About Henzo Farm</h2>
+                <p>Henzo Farm was founded by Maaz Mustafa Minhas with a simple mission: to bring back the tradition of pure, heritage poultry breeding in Islamabad.</p>
+                <p>Located in the pristine foothills of Pindorian Shareef, our farm specializes in two world-class heritage breeds — the record-breaking Black Australorp and the resilient Rhode Island Red.</p>
+                <p>From day-old chicks to mature laying hens, from breeding pairs to farm-fresh organic eggs, we deliver quality you can taste and trust. Every egg has a golden yolk. Every bird is raised with integrity.</p>
+                <div class="about-quote">"Healthy Birds. Healthy Life."</div>
             </div>
-            <div class="process-step">
-                <div class="process-icon">🌾</div>
-                <h4>Organic Feed</h4>
-                <p>100% organic, non-GMO feed with no chemicals or hormones</p>
-            </div>
-            <div class="process-step">
-                <div class="process-icon">📅</div>
-                <h4>Daily Collection</h4>
-                <p>Fresh eggs collected by hand every single morning</p>
-            </div>
-            <div class="process-step">
-                <div class="process-icon">🚚</div>
-                <h4>Delivered Fresh</h4>
-                <p>Same-day delivery across Islamabad & Rawalpindi</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Certifications / Guarantees -->
-    <section class="certs-section">
-        <div class="section-header">
-            <div class="section-label"><i class="fa-solid fa-award"></i> You're Covered</div>
-            <h2 class="section-title">Our Guarantees</h2>
-        </div>
-        <div class="certs-grid">
-            <div class="cert-card" data-reveal="fade-up">
-                <div class="cert-icon"><i class="fa-solid fa-leaf"></i></div>
-                <h4>100% Organic</h4>
-                <p>Non-GMO feed, no chemicals or hormones</p>
-            </div>
-            <div class="cert-card" data-reveal="fade-up" style="transition-delay:0.1s;">
-                <div class="cert-icon"><i class="fa-solid fa-syringe"></i></div>
-                <h4>Vaccinated Stock</h4>
-                <p>Full vaccination records provided</p>
-            </div>
-            <div class="cert-card" data-reveal="fade-up" style="transition-delay:0.2s;">
-                <div class="cert-icon"><i class="fa-solid fa-rotate-left"></i></div>
-                <h4>Freshness Promise</h4>
-                <p>Not fresh? We'll make it right</p>
-            </div>
-            <div class="cert-card" data-reveal="fade-up" style="transition-delay:0.3s;">
-                <div class="cert-icon"><i class="fa-solid fa-headset"></i></div>
-                <h4>Real Support</h4>
-                <p>Direct WhatsApp line to the farm</p>
+            <div class="about-image" data-reveal="slide-right">
+                <img loading="lazy" decoding="async" src="images/farm_pasture.jpg" alt="Henzo Farm" onerror="this.style.display='none'">
             </div>
         </div>
     </section>
@@ -2279,6 +2072,42 @@
         </div>
     </section>
 
+    <!-- How to Order Section -->
+    <section class="how-to-order-section" id="how-to-order">
+        <div class="how-to-order-container">
+            <div class="section-header">
+                <div class="section-label"><i class="fa-solid fa-list-ol"></i> Simple Process</div>
+                <h2 class="section-title">How to Order</h2>
+                <p class="section-subtitle">Get farm-fresh products delivered in 4 easy steps</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h4>Browse Products</h4>
+                    <p>Select eggs, chicks, hens, or breeding pairs from our collection</p>
+                    <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h4>Add to Cart</h4>
+                    <p>Choose quantities and categories that fit your needs</p>
+                    <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h4>Enter Details</h4>
+                    <p>Fill your name, phone, delivery area and full address</p>
+                    <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h4>Confirm on WhatsApp</h4>
+                    <p>We confirm your order and schedule delivery time</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- FAQ Section -->
     <section class="faq-section" id="faq">
         <div class="section-header">
@@ -2360,22 +2189,6 @@
         </div>
     </section>
 
-    <!-- About Section -->
-    <section class="about-section" id="about">
-        <div class="about-container">
-            <div class="about-content" data-reveal="slide-left">
-                <h2>About Henzo Farm</h2>
-                <p>Henzo Farm was founded by Maaz Mustafa Minhas and Furqan Mustafa Minhas with a simple mission: to bring back the tradition of pure, heritage poultry breeding in Islamabad.</p>
-                <p>Located in the pristine foothills of Pindorian Shareef, our farm specializes in two world-class heritage breeds — the record-breaking Black Australorp and the resilient Rhode Island Red.</p>
-                <p>From day-old chicks to mature laying hens, from breeding pairs to farm-fresh organic eggs, we deliver quality you can taste and trust. Every egg has a golden yolk. Every bird is raised with integrity.</p>
-                <div class="about-quote">"Healthy Birds. Healthy Life."</div>
-            </div>
-            <div class="about-image" data-reveal="slide-right">
-                <img loading="lazy" decoding="async" src="images/farm_pasture.jpg" alt="Henzo Farm" onerror="this.style.display='none'">
-            </div>
-        </div>
-    </section>
-
     <!-- Contact Section -->
     <section class="contact-section" id="contact">
         <div class="contact-container">
@@ -2402,7 +2215,7 @@
                     <i class="fa-solid fa-envelope"></i>
                     <div>
                         <div class="label">Email</div>
-                        <div class="value">henzofarm@gmail.com</div>
+                        <div class="value">hello@henzofarm.com</div>
                     </div>
                 </div>
 
@@ -2481,7 +2294,7 @@
                 <h4>Quick Links</h4>
                 <a href="#eggs">Fresh Eggs</a>
                 <a href="#breeds">Our Breeds</a>
-                <a href="#process">Our Process</a>
+                <a href="#about">About Us</a>
                 <a href="#gallery">Gallery</a>
             </div>
 
@@ -2512,11 +2325,6 @@
     <a class="wa-float" href="https://wa.me/923115190548" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
         <i class="fa-brands fa-whatsapp"></i>
     </a>
-
-    <!-- Back to Top -->
-    <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
-        <i class="fa-solid fa-arrow-up"></i>
-    </button>
 
     <!-- Cookie Consent -->
     <div class="cookie-banner" id="cookieBanner" role="dialog" aria-label="Cookie consent">
@@ -2551,7 +2359,7 @@
             eggs: {
                 basePrice: 549,          // 1 dozen
                 packageAdjustments: { 2: 1 }, // Rs. 1 adjustment makes the 2-dozen pack Rs. 1,099
-                packageDiscounts: { 4: 0.05, 5: 0.10 }
+                packageDiscounts: { 4: 0.025, 5: 0.05 }
             },
             meat: [
                 { id: 'live',  name: 'Live Weight',      price: 1199, unit: 'kg', emoji: '🐓',
@@ -2571,7 +2379,7 @@
             const base = PRODUCTS.eggs.basePrice * dozen;
             const discount = PRODUCTS.eggs.packageDiscounts[dozen] || 0;
             const adjustment = PRODUCTS.eggs.packageAdjustments[dozen] || 0;
-            const final = +(base * (1 - discount) + adjustment).toFixed(2);
+            const final = Math.round(base * (1 - discount) + adjustment);
             return { base: base, discount: discount, final: final };
         }
         function fmtRs(n) {
@@ -2685,8 +2493,8 @@
                 const disc = Math.round(orig * (1 - CONFIG.BREEDING_PAIR_DISCOUNT));
                 el.innerHTML =
                     '<span class="price" style="text-decoration:line-through;color:#999;font-size:14px;margin-right:6px;">Rs. ' + orig.toLocaleString() + '</span>' +
-                    '<span class="price" style="color:#c9a227;">Rs. ' + disc.toLocaleString() + '</span>' +
-                    '<span style="display:block;font-size:11px;color:#c9a227;font-weight:700;">' + pct + '% OFF Applied</span>';
+                    '<span class="price" style="color:#8a6d14;">Rs. ' + disc.toLocaleString() + '</span>' +
+                    '<span style="display:block;font-size:11px;color:#8a6d14;font-weight:700;">' + pct + '% OFF Applied</span>';
             });
         }
 
@@ -2919,12 +2727,14 @@
 
             const totalSavings = cart.reduce((a, i) => a + ((i.originalPrice || i.price) - i.price) * i.qty, 0);
             const savingsRow = totalSavings > 0
-                ? '<div class="checkout-item" style="border-bottom:none;color:#c9a227;font-weight:700"><span class="name">🎉 You saved</span><span class="price" style="color:#c9a227">Rs ' + fmtRs(totalSavings) + '</span></div>'
+                ? '<div class="checkout-item" style="border-bottom:none;color:var(--gold-text);font-weight:700"><span class="name">🎉 You saved</span><span class="price" style="color:var(--gold-text)">Rs ' + fmtRs(totalSavings) + '</span></div>'
                 : '';
             const pairPct = Math.round(CONFIG.BREEDING_PAIR_DISCOUNT * 100);
             document.getElementById('checkoutItems').innerHTML = cart.map(item => 
-                '<div class="checkout-item"><span class="name">' + itemQuantityLabel(item) + ' ' + item.name + liveWeightDetails(item) + (item.pricingMode === 'estimated-live-weight' ? ' <span class="preorder-inline">· estimated</span>' : '') + (item.originalPrice ? ' <span style="color:#c9a227;font-size:12px">(' + pairPct + '% OFF)</span>' : '') + (item.preorder ? ' <span class="preorder-inline">· pre-order</span>' : '') + '</span><span class="price">Rs ' + fmtRs(itemLineTotal(item)) + '</span></div>'
+                '<div class="checkout-item"><span class="name">' + itemQuantityLabel(item) + ' ' + item.name + liveWeightDetails(item) + (item.pricingMode === 'estimated-live-weight' ? ' <span class="preorder-inline">· estimated</span>' : '') + (item.originalPrice ? ' <span style="color:var(--gold-text);font-size:12px">(' + pairPct + '% OFF)</span>' : '') + (item.preorder ? ' <span class="preorder-inline">· pre-order</span>' : '') + '</span><span class="price">Rs ' + fmtRs(itemLineTotal(item)) + '</span></div>'
             ).join('') + savingsRow;
+            document.getElementById('checkoutSubtotal').innerText = 'Rs ' + fmtRs(subtotal);
+            document.getElementById('checkoutDelivery').innerText = delivery === 0 ? 'FREE' : 'Rs ' + fmtRs(delivery);
             document.getElementById('checkoutTotal').innerText = 'Rs ' + fmtRs(total);
 
             document.getElementById('checkoutOverlay').classList.add('open');
@@ -3268,22 +3078,24 @@
         // ==================== EGG SECTION RENDERING (from PRODUCTS data) ====================
         function eggLabel(d) { return d === 1 ? '1 Dozen' : d === 2 ? '2 Dozen' : d + ' Dozen'; }
 
+        const EGG_CARD_IMAGES = ['images/pasture_raised_eggs.jpg', 'images/eggs_wooden_tray.jpg', 'images/eggs_basket.jpg', 'images/eggs_basket.jpg'];
         function renderEggsGrid() {
             const grid = document.getElementById('eggsGrid');
             if (!grid) return;
-            grid.innerHTML = EGG_PACKS.map(function(d) {
+            grid.innerHTML = EGG_PACKS.map(function(d, i) {
                 const p = eggPriceWithDiscount(d);
                 const popular = (d === 5);
                 const perEgg = +(p.final / (d * 12)).toFixed(2);
                 return '<div class="egg-package' + (popular ? ' popular' : '') + '">' +
                     (popular ? '<div class="popular-badge">POPULAR</div>' : '') +
+                    '<img class="egg-package-img" src="' + EGG_CARD_IMAGES[i % EGG_CARD_IMAGES.length] + '" alt="' + eggLabel(d) + ' eggs" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">' +
                     '<div class="dozen">' + eggLabel(d) + '</div>' +
                     '<div class="qty">' + (d * 12) + '</div>' +
                     '<div class="eggs-count">eggs</div>' +
                     '<div class="price">Rs. ' + fmtRs(p.final) + '</div>' +
-                    (p.discount ? '<div class="egg-price-original">Rs. ' + fmtRs(p.base) + ' <span class="discount-badge">' + Math.round(p.discount * 100) + '% OFF · save Rs. ' + fmtRs(+(p.base - p.final).toFixed(2)) + '</span></div>' : '') +
+                    (p.discount ? '<div class="egg-price-original">Rs. ' + fmtRs(p.base) + ' <span class="discount-badge">' + Math.round(p.discount * 100) + '% OFF · save Rs. ' + fmtRs(p.base - p.final) + '</span></div>' : '') +
                     '<div class="per-egg">Rs. ' + fmtRs(perEgg) + ' per egg</div>' +
-                    '<button class="btn-add-cart" onclick="addToCart(\'' + eggLabel(d) + ' Eggs (' + (d * 12) + ')\', ' + p.final + ')"><i class="fa-solid fa-plus"></i> Add to Cart</button>' +
+                    '<button class="btn-add-cart" onclick="openEggModal()"><i class="fa-solid fa-cart-plus"></i> Select Options</button>' +
                 '</div>';
             }).join('');
         }
@@ -3380,13 +3192,6 @@
 
         // ==================== BREED SELECTION MODAL ====================
         function openBreedModal() {
-            const body = document.getElementById('breedModalBody');
-            if (!body.dataset.filled) {
-                const source = document.getElementById('breedsGrid');
-                body.innerHTML = source.outerHTML;
-                body.dataset.filled = '1';
-                renderBreedPrices();
-            }
             openProductModal('breedModalOverlay');
         }
         function closeBreedModal() {
@@ -3472,7 +3277,6 @@
                 if (s.meat_live) PRODUCTS.meat[0].price = +s.meat_live;
                 if (s.meat_whole) PRODUCTS.meat[1].price = +s.meat_whole;
             } // null/failed fetch — keep default prices
-            renderAllProducts();
         }
 
         // ==================== CAMPAIGN ENGINE (inactive until you publish one) ====================
@@ -3556,17 +3360,22 @@
         }
 
         // ==================== INIT ====================
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             renderBreedPrices();
             updateCartUI();
             updateFloatingBar();
-            renderAllProducts();   // eggs grid + egg modal + meat modal (default prices)
-            loadSettings();        // admin-set prices override defaults, then re-render
-            loadCampaigns();       // shows NOTHING unless an active campaign exists
-            initScrollExtras();    // progress bar + back-to-top
-            initScrollReveal();    // fade-up/slide/scale-in on scroll
-            initCounters();        // animated stat counters
-            initCookieBanner();    // cookie consent banner
+            initScrollExtras();
+            initScrollReveal();
+            initCounters();
+            initCookieBanner();
+            // dim price grids until admin prices arrive (max 1s), then render ONCE — no default→real flash
+            const loadingEls = ['eggsGrid', 'freshMeatGrid'].map(id => document.getElementById(id)).filter(Boolean);
+            renderAllProducts();
+            loadingEls.forEach(el => el.classList.add('is-loading'));
+            await Promise.race([loadSettings(), new Promise(r => setTimeout(r, 1000))]);
+            renderAllProducts();
+            loadingEls.forEach(el => el.classList.remove('is-loading'));
+            loadCampaigns();
         });
     </script>
 
@@ -3592,6 +3401,8 @@
             </div>
 
             <div class="egg-modal-options" id="eggModalOptions"></div>
+
+            <p style="margin:0 32px 4px;font-size:12px;color:var(--text-light);"><i class="fa-solid fa-circle-info" style="color:var(--gold-text);"></i> Free delivery on orders above Rs. 1,499 — otherwise a flat Rs. 200 delivery charge applies.</p>
 
             <div class="egg-modal-footer">
                 <div class="egg-modal-total">
@@ -3627,6 +3438,7 @@
             <div class="egg-modal-options" id="meatModalOptions"></div>
 
             <div class="preorder-note" style="margin:4px 32px 4px;"><i class="fa-solid fa-scale-balanced"></i><span>Birds are weighed at delivery — you only pay for the exact weight.</span></div>
+            <p style="margin:0 32px 4px;font-size:12px;color:var(--text-light);"><i class="fa-solid fa-circle-info" style="color:var(--gold-text);"></i> Free delivery on orders above Rs. 1,499 — otherwise a flat Rs. 200 delivery charge applies.</p>
 
             <div class="egg-modal-footer">
                 <div class="egg-modal-total">
@@ -3654,7 +3466,156 @@
                 </div>
             </div>
 
-            <div id="breedModalBody"></div>
+            <div id="breedModalBody">
+                <div class="breeds-grid">
+                    <!-- Black Australorp -->
+                    <div class="breed-card">
+                        <div class="breed-image">
+                            <img loading="lazy" decoding="async" src="images/australorp_hen.jpg" alt="Black Australorp" onerror="this.style.display='none'">
+                            <span class="breed-badge record">Record Layer</span>
+                        </div>
+                        <div class="breed-info">
+                            <h3 class="breed-name">Black Australorp</h3>
+                            <p class="breed-desc">World-record egg layer with gentle temperament. Beautiful jet-black plumage with beetle-green sheen.</p>
+                            <div class="breed-tags">
+                                <span class="breed-tag">250+ eggs/year</span>
+                                <span class="breed-tag">Jet Black</span>
+                                <span class="breed-tag">Gentle nature</span>
+                            </div>
+                            <div class="breed-prices">
+                                <div class="breed-price-row">
+                                    <span class="label">Day-Old Chick <span class="preorder-tag"><i class="fa-solid fa-clock"></i> Pre-order</span></span>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <span class="price">Rs. 130</span>
+                                        <button class="btn-sm" onclick="addToCart('Australorp Day-Old Chick', 130)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="breed-price-row">
+                                    <span class="label">Mature Hen</span>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <span class="price">Rs. 2,500</span>
+                                        <button class="btn-sm" onclick="addToCart('Australorp Mature Hen', 2500)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="breed-price-row">
+                                    <span class="label">Breeding Rooster</span>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <span class="price">Rs. 3,000</span>
+                                        <button class="btn-sm" onclick="addToCart('Australorp Breeding Rooster', 3000)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="breed-price-row">
+                                    <span class="label">Breeding Pair (1 Rooster + 5 Hens)</span>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <div>
+                                            <span class="pair-price" data-original="15500"></span>
+                                        </div>
+                                        <button class="btn-sm" onclick="addToCart('Australorp Breeding Pair (1 Rooster + 5 Hens)', 15500)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rhode Island Red -->
+                    <div class="breed-card">
+                        <div class="breed-image">
+                            <img loading="lazy" decoding="async" src="images/rir_rooster.jpg" alt="Rhode Island Red" onerror="this.style.display='none'">
+                            <span class="breed-badge heritage">Heritage Classic</span>
+                        </div>
+                        <div class="breed-info">
+                            <h3 class="breed-name">Rhode Island Red</h3>
+                            <p class="breed-desc">America's heritage dual-purpose breed. Hardy, productive, and stunning rich mahogany plumage.</p>
+                            <div class="breed-tags">
+                                <span class="breed-tag">280+ eggs/year</span>
+                                <span class="breed-tag">Rich Mahogany</span>
+                                <span class="breed-tag">Hardy</span>
+                            </div>
+                            <div class="breed-prices">
+                                <div class="breed-price-row">
+                                    <span class="label">Day-Old Chick <span class="preorder-tag"><i class="fa-solid fa-clock"></i> Pre-order</span></span>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <span class="price">Rs. 130</span>
+                                        <button class="btn-sm" onclick="addToCart('RIR Day-Old Chick', 130)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="breed-price-row">
+                                    <span class="label">Mature Hen</span>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <span class="price">Rs. 2,500</span>
+                                        <button class="btn-sm" onclick="addToCart('RIR Mature Hen', 2500)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="breed-price-row">
+                                    <span class="label">Breeding Rooster</span>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <span class="price">Rs. 3,000</span>
+                                        <button class="btn-sm" onclick="addToCart('RIR Breeding Rooster', 3000)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="breed-price-row">
+                                    <span class="label">Breeding Pair (1 Rooster + 5 Hens)</span>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <div>
+                                            <span class="pair-price" data-original="15500"></span>
+                                        </div>
+                                        <button class="btn-sm" onclick="addToCart('RIR Breeding Pair (1 Rooster + 5 Hens)', 15500)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Misri (Fayoumi) -->
+                    <div class="breed-card">
+                        <div class="breed-image">
+                            <img loading="lazy" decoding="async" src="images/fayoumi_chick.jpg" alt="Misri Fayoumi" onerror="this.style.display='none'">
+                            <span class="breed-badge heat">Heat Hardy</span>
+                        </div>
+                        <div class="breed-info">
+                            <h3 class="breed-name">Misri (Fayoumi)</h3>
+                            <p class="breed-desc">Ancient Egyptian breed perfect for Pakistani climate. Exceptional heat tolerance with beautiful silver penciled plumage.</p>
+                            <div class="breed-tags">
+                                <span class="breed-tag">200+ eggs/year</span>
+                                <span class="breed-tag">Silver Penciled</span>
+                                <span class="breed-tag">Heat tolerant</span>
+                            </div>
+                            <div class="breed-prices">
+                                <div class="breed-price-row">
+                                    <span class="label">Day-Old Chick <span class="preorder-tag"><i class="fa-solid fa-clock"></i> Pre-order</span></span>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <span class="price">Rs. 70</span>
+                                        <button class="btn-sm" onclick="addToCart('Misri Day-Old Chick', 70)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="breed-price-row">
+                                    <span class="label">Mature Hen</span>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <span class="price">Rs. 2,200</span>
+                                        <button class="btn-sm" onclick="addToCart('Misri Mature Hen', 2200)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="breed-price-row">
+                                    <span class="label">Breeding Rooster</span>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <span class="price">Rs. 2,500</span>
+                                        <button class="btn-sm" onclick="addToCart('Misri Breeding Rooster', 2500)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="breed-price-row">
+                                    <span class="label">Breeding Pair (1 Rooster + 5 Hens)</span>
+                                    <div style="display:flex;align-items:center;gap:12px;">
+                                        <div>
+                                            <span class="pair-price" data-original="13500"></span>
+                                        </div>
+                                        <button class="btn-sm" onclick="addToCart('Misri Breeding Pair (1 Rooster + 5 Hens)', 13500)"><i class="fa-solid fa-plus"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
