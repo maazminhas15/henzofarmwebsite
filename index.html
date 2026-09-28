@@ -1551,6 +1551,21 @@
         /* ===== PREMIUM SUCCESS MODAL GRADIENT ===== */
         .success-circle { background: linear-gradient(135deg, #2d5a27 0%, #4a8f3f 50%, #2d5a27 100%); }
 
+        /* ===== ADDED-TO-CART POPUP ===== */
+        .added-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 4200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+        .added-overlay.open { display: flex; }
+        .added-modal { background: var(--white); border-radius: var(--radius-lg); width: 100%; max-width: 380px; padding: 32px 26px 24px; text-align: center; box-shadow: var(--shadow-xl); animation: slideUp 0.3s ease; }
+        .added-check { width: 64px; height: 64px; border-radius: 50%; background: var(--dark-green); color: var(--gold-light); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px; }
+        .added-modal h3 { font-size: 20px; color: var(--dark-green); margin-bottom: 6px; }
+        .added-modal p { font-size: 14px; color: var(--text-light); margin-bottom: 4px; }
+        .added-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .added-actions button { padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; border: 2px solid var(--dark-green); transition: all 0.3s; }
+        .added-primary { background: var(--dark-green); color: var(--white); }
+        .added-primary:hover { background: var(--gold); border-color: var(--gold); color: var(--dark-green); }
+        .added-secondary { background: transparent; color: var(--dark-green); }
+        .added-secondary:hover { background: var(--cream); }
+        .added-link { display: inline-block; margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--gold-text); cursor: pointer; background: none; border: none; font-family: inherit; }
+
         /* ===== EGG CARD IMAGE ===== */
         .egg-package-img { width: 100%; aspect-ratio: 3 / 2; height: auto; object-fit: cover; border-radius: 12px; margin-bottom: 14px; background: #e8e4dc; }
 
@@ -3078,15 +3093,23 @@
         // ==================== EGG SECTION RENDERING (from PRODUCTS data) ====================
         function eggLabel(d) { return d === 1 ? '1 Dozen' : d === 2 ? '2 Dozen' : d + ' Dozen'; }
 
-        // One-tap ordering from a pack card: adds that exact pack and jumps straight to checkout
+        // One-tap ordering from a pack card: adds that exact pack to the cart and confirms with a popup (customer can keep shopping)
         function orderEggPack(d) {
             const p = eggPriceWithDiscount(d);
             const name = eggLabel(d) + ' Eggs (' + (d * 12) + ')';
-            if (!cart.find(i => i.name === name)) cart.push({ name: name, price: p.final, qty: 1 });
+            const existing = cart.find(i => i.name === name);
+            if (existing) existing.qty++;
+            else cart.push({ name: name, price: p.final, qty: 1 });
             saveCart();
             updateCartUI();
             updateFloatingBar();
-            openCheckout();
+            const count = cart.reduce((a, i) => a + i.qty, 0);
+            document.getElementById('addedItem').innerText = name + ' — Rs ' + fmtRs(p.final);
+            document.getElementById('addedCartInfo').innerText = 'Your cart: ' + count + ' item' + (count > 1 ? 's' : '') + ' · Rs ' + fmtRs(cartSubtotal());
+            document.getElementById('addedOverlay').classList.add('open');
+        }
+        function closeAddedPopup() {
+            document.getElementById('addedOverlay').classList.remove('open');
         }
 
         const EGG_CARD_IMAGES = { 1: 'images/1_dozen.jpg', 2: 'images/2_dozen.png', 4: 'images/4_dozen.png', 5: 'images/5_dozen.png' };
@@ -3640,6 +3663,21 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Added-to-cart popup -->
+    <div class="added-overlay" id="addedOverlay" onclick="if(event.target===this)closeAddedPopup()">
+        <div class="added-modal" role="dialog" aria-modal="true" aria-labelledby="addedTitle">
+            <div class="added-check"><i class="fa-solid fa-check"></i></div>
+            <h3 id="addedTitle">Added to your cart!</h3>
+            <p id="addedItem"></p>
+            <p id="addedCartInfo" style="font-weight:600;color:var(--dark-green);"></p>
+            <div class="added-actions">
+                <button class="added-primary" onclick="closeAddedPopup(); openCart();"><i class="fa-solid fa-cart-shopping"></i> View Cart</button>
+                <button class="added-secondary" onclick="closeAddedPopup()">Keep Shopping</button>
+            </div>
+            <button class="added-link" onclick="closeAddedPopup(); scrollToSection('fresh-meat');">Also add fresh meat →</button>
         </div>
     </div>
 
