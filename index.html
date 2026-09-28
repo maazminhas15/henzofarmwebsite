@@ -3079,6 +3079,19 @@
         function eggLabel(d) { return d === 1 ? '1 Dozen' : d === 2 ? '2 Dozen' : d + ' Dozen'; }
 
         const EGG_CARD_IMAGES = { 1: 'images/1_dozen.jpg', 2: 'images/2_dozen.png', 4: 'images/4_dozen.png', 5: 'images/5_dozen.png' };
+        // If a pack photo fails to load (wrong extension/name on the server), try other likely names, then a generic egg photo
+        function eggImgAlts(d) {
+            const base = 'images/' + d + '_dozen';
+            return [base + '.jpg', base + '.jpeg', base + '.png', base + '.JPG', base + '.PNG', base + '.webp', 'images/' + d + '_Dozen.jpg', 'images/' + d + '-dozen.jpg', 'images/pasture_raised_eggs.jpg'].join('|');
+        }
+        function eggImgError(img) {
+            const list = (img.dataset.alts || '').split('|').filter(Boolean);
+            const cur = img.getAttribute('src');
+            let next = list.shift();
+            while (next && next === cur) next = list.shift();
+            if (next) { img.dataset.alts = list.join('|'); img.src = next; }
+            else img.style.display = 'none';
+        }
         function renderEggsGrid() {
             const grid = document.getElementById('eggsGrid');
             if (!grid) return;
@@ -3088,7 +3101,7 @@
                 const perEgg = +(p.final / (d * 12)).toFixed(2);
                 return '<div class="egg-package' + (popular ? ' popular' : '') + '">' +
                     (popular ? '<div class="popular-badge">POPULAR</div>' : '') +
-                    '<img class="egg-package-img" src="' + (EGG_CARD_IMAGES[d] || 'images/pasture_raised_eggs.jpg') + '" alt="' + eggLabel(d) + ' eggs" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">' +
+                    '<img class="egg-package-img" src="' + (EGG_CARD_IMAGES[d] || 'images/pasture_raised_eggs.jpg') + '" alt="' + eggLabel(d) + ' eggs" loading="lazy" decoding="async" data-alts="' + eggImgAlts(d) + '" onerror="eggImgError(this)">' +
                     '<div class="dozen">' + eggLabel(d) + '</div>' +
                     '<div class="qty">' + (d * 12) + '</div>' +
                     '<div class="eggs-count">eggs</div>' +
