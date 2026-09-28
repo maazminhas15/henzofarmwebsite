@@ -3078,6 +3078,17 @@
         // ==================== EGG SECTION RENDERING (from PRODUCTS data) ====================
         function eggLabel(d) { return d === 1 ? '1 Dozen' : d === 2 ? '2 Dozen' : d + ' Dozen'; }
 
+        // One-tap ordering from a pack card: adds that exact pack and jumps straight to checkout
+        function orderEggPack(d) {
+            const p = eggPriceWithDiscount(d);
+            const name = eggLabel(d) + ' Eggs (' + (d * 12) + ')';
+            if (!cart.find(i => i.name === name)) cart.push({ name: name, price: p.final, qty: 1 });
+            saveCart();
+            updateCartUI();
+            updateFloatingBar();
+            openCheckout();
+        }
+
         const EGG_CARD_IMAGES = { 1: 'images/1_dozen.jpg', 2: 'images/2_dozen.png', 4: 'images/4_dozen.png', 5: 'images/5_dozen.png' };
         // If a pack photo fails to load (wrong extension/name on the server), try other likely names, then a generic egg photo
         function eggImgAlts(d) {
@@ -3108,7 +3119,7 @@
                     '<div class="price">Rs. ' + fmtRs(p.final) + '</div>' +
                     (p.discount ? '<div class="egg-price-original">Rs. ' + fmtRs(p.base) + ' <span class="discount-badge">' + Math.round(p.discount * 100) + '% OFF · save Rs. ' + fmtRs(p.base - p.final) + '</span></div>' : '') +
                     '<div class="per-egg">Rs. ' + fmtRs(perEgg) + ' per egg</div>' +
-                    '<button class="btn-add-cart" onclick="openEggModal()"><i class="fa-solid fa-cart-plus"></i> Select Options</button>' +
+                    '<button class="btn-add-cart" onclick="orderEggPack(' + d + ')"><i class="fa-solid fa-bolt"></i> Order Now</button>' +
                 '</div>';
             }).join('');
         }
