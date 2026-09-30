@@ -1551,6 +1551,46 @@
         /* ===== PREMIUM SUCCESS MODAL GRADIENT ===== */
         .success-circle { background: linear-gradient(135deg, #2d5a27 0%, #4a8f3f 50%, #2d5a27 100%); }
 
+        /* ===== ADMIN PRICE PANEL (only visible with ?admin=key in the URL) ===== */
+        .admin-fab {
+            position: fixed; bottom: 24px; left: 24px; z-index: 4600;
+            width: 52px; height: 52px; border-radius: 50%;
+            background: var(--dark-green-deep); color: var(--gold-light); border: none;
+            font-size: 20px; cursor: pointer; box-shadow: var(--shadow-lg);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .admin-fab:hover { background: var(--gold); color: var(--dark-green); }
+        .admin-panel-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 4700;
+            display: none; align-items: center; justify-content: center; padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .admin-panel-overlay.open { display: flex; }
+        .admin-panel {
+            background: var(--white); border-radius: var(--radius-lg); width: 100%; max-width: 420px;
+            padding: 28px; box-shadow: var(--shadow-xl); animation: slideUp 0.3s ease; position: relative;
+        }
+        .admin-panel h3 { color: var(--dark-green); font-size: 20px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+        .admin-panel .admin-sub { font-size: 13px; color: var(--text-light); margin-bottom: 20px; }
+        .admin-field { margin-bottom: 16px; }
+        .admin-field label { display: block; font-size: 13px; font-weight: 700; color: var(--dark-green); margin-bottom: 6px; }
+        .admin-field input {
+            width: 100%; padding: 12px 14px; border: 2px solid var(--cream-dark); border-radius: 10px;
+            font-family: inherit; font-size: 15px; outline: none; transition: all 0.2s;
+        }
+        .admin-field input:focus { border-color: var(--gold); }
+        .admin-save {
+            width: 100%; padding: 14px; background: var(--dark-green); color: var(--white); border: none;
+            border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 6px;
+            display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;
+        }
+        .admin-save:hover { background: var(--gold); color: var(--dark-green); }
+        .admin-save:disabled { opacity: 0.6; cursor: not-allowed; }
+        .admin-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; background: var(--cream); border: none; cursor: pointer; color: var(--dark-green); }
+        .admin-status { font-size: 13px; margin-top: 12px; text-align: center; min-height: 18px; font-weight: 600; }
+        .admin-status.ok { color: var(--dark-green); }
+        .admin-status.err { color: #dc2626; }
+
         /* ===== ADDED-TO-CART POPUP ===== */
         .added-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 4200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
         .added-overlay.open { display: flex; }
@@ -1643,6 +1683,42 @@
             "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
             "opens": "07:00",
             "closes": "18:00"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "Organic Pasture-Raised Eggs — Henzo Farm",
+        "image": "https://maazminhas15.github.io/henzofarm/images/eggs_basket.jpg",
+        "description": "Organic, pasture-raised eggs collected daily and delivered fresh across Islamabad & Rawalpindi.",
+        "brand": { "@type": "Brand", "name": "Henzo Farm" },
+        "offers": {
+            "@type": "AggregateOffer",
+            "priceCurrency": "PKR",
+            "lowPrice": "549",
+            "highPrice": "2610",
+            "offerCount": "4",
+            "availability": "https://schema.org/InStock"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "Farm-Fresh Chicken Meat — Henzo Farm",
+        "image": "https://maazminhas15.github.io/henzofarm/images/farm_pasture.jpg",
+        "description": "Farm-raised chicken sold by live weight or as cleaned whole dressed meat, delivered fresh across Islamabad & Rawalpindi.",
+        "brand": { "@type": "Brand", "name": "Henzo Farm" },
+        "offers": {
+            "@type": "AggregateOffer",
+            "priceCurrency": "PKR",
+            "lowPrice": "1199",
+            "highPrice": "2299",
+            "offerCount": "2",
+            "availability": "https://schema.org/InStock"
         }
     }
     </script>
@@ -1851,7 +1927,7 @@
     <div class="trust-bar">
         <div class="trust-bar-item"><i class="fa-solid fa-shield-halved"></i> 100% Farm Fresh</div>
         <div class="trust-bar-item">
-            <i class="fa-solid fa-truck-fast"></i> Fast Delivery
+            <i class="fa-solid fa-truck-fast"></i> Same-Day Delivery
             <span class="delivery-info" tabindex="0" aria-label="Delivery fee info">
                 <i class="fa-solid fa-circle-info"></i>
                 <span class="delivery-tooltip">Free delivery on orders above Rs. 1,499. Below that, a flat Rs. 200 delivery charge applies.</span>
@@ -2811,6 +2887,21 @@
             }
         }
 
+        async function supabaseUpdate(table, filterQuery, row) {
+            try {
+                const response = await withTimeout(fetch(CONFIG.SUPABASE_URL + '/rest/v1/' + table + filterQuery, {
+                    method: 'PATCH',
+                    headers: supabaseHeaders({ 'Prefer': 'return=minimal' }),
+                    body: JSON.stringify(row)
+                }), CONFIG.SHEET_TIMEOUT);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return true;
+            } catch (err) {
+                console.log('Supabase update failed (' + table + '):', err);
+                return false;
+            }
+        }
+
         function saveOrderToSheets(orderData) {
             return supabaseInsert('orders', {
                 order_id: orderData.orderId,
@@ -3070,7 +3161,8 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key !== 'Escape') return;
-            if (document.getElementById('breedModalOverlay').classList.contains('open')) closeBreedModal();
+            if (document.getElementById('adminPanelOverlay').classList.contains('open')) closeAdminPanel();
+            else if (document.getElementById('breedModalOverlay').classList.contains('open')) closeBreedModal();
             else if (document.getElementById('meatModalOverlay').classList.contains('open')) closeMeatModal();
             else if (document.getElementById('eggModalOverlay').classList.contains('open')) closeEggModal();
             else if (document.getElementById('checkoutOverlay').classList.contains('open')) closeCheckout();
@@ -3308,6 +3400,55 @@
             showToast('Fresh meat added to cart!');
         }
 
+        // ==================== ADMIN PRICE PANEL ====================
+        // Change ADMIN_KEY to anything you like, then bookmark: yoursite.com/?admin=<that key>
+        const ADMIN_KEY = 'henzofarm2026';
+        function isAdminUrl() {
+            try { return new URLSearchParams(window.location.search).get('admin') === ADMIN_KEY; }
+            catch (e) { return false; }
+        }
+        function openAdminPanel() {
+            document.getElementById('adminEggPrice').value = PRODUCTS.eggs.basePrice;
+            document.getElementById('adminMeatLive').value = PRODUCTS.meat[0].price;
+            document.getElementById('adminMeatWhole').value = PRODUCTS.meat[1].price;
+            document.getElementById('adminStatus').textContent = '';
+            document.getElementById('adminPanelOverlay').classList.add('open');
+        }
+        function closeAdminPanel() {
+            document.getElementById('adminPanelOverlay').classList.remove('open');
+        }
+        async function saveAdminPrices() {
+            const eggPrice = +document.getElementById('adminEggPrice').value;
+            const liveWeight = +document.getElementById('adminMeatLive').value;
+            const wholeMeat = +document.getElementById('adminMeatWhole').value;
+            const status = document.getElementById('adminStatus');
+            const btn = document.getElementById('adminSaveBtn');
+            if (!eggPrice || !liveWeight || !wholeMeat) {
+                status.textContent = 'Please fill in all three prices.';
+                status.className = 'admin-status err';
+                return;
+            }
+            btn.disabled = true;
+            status.textContent = 'Saving...';
+            status.className = 'admin-status';
+            const ok = await supabaseUpdate('settings', '?id=eq.1', {
+                eggs_base_price: eggPrice, meat_live: liveWeight, meat_whole: wholeMeat
+            });
+            btn.disabled = false;
+            if (ok) {
+                PRODUCTS.eggs.basePrice = eggPrice;
+                PRODUCTS.meat[0].price = liveWeight;
+                PRODUCTS.meat[1].price = wholeMeat;
+                renderAllProducts();
+                status.textContent = 'Saved! Prices are now live for everyone.';
+                status.className = 'admin-status ok';
+                setTimeout(closeAdminPanel, 1400);
+            } else {
+                status.textContent = 'Could not save — check your internet connection and try again.';
+                status.className = 'admin-status err';
+            }
+        }
+
         // ==================== ADMIN PRICES (loaded from Google Apps Script) ====================
         function renderAllProducts() {
             renderEggsGrid();
@@ -3423,6 +3564,7 @@
             renderAllProducts();
             loadingEls.forEach(el => el.classList.remove('is-loading'));
             loadCampaigns();
+            if (isAdminUrl()) document.getElementById('adminFab').style.display = 'flex';
         });
     </script>
 
@@ -3476,7 +3618,7 @@
                     <p class="egg-modal-desc">Healthy, farm-raised birds — available live by weight, or as fresh whole dressed meat.</p>
                     <div class="egg-modal-tags">
                         <span><i class="fa-solid fa-check"></i> Farm Fresh</span>
-                        <span><i class="fa-solid fa-bolt"></i> Fast Delivery</span>
+                        <span><i class="fa-solid fa-bolt"></i> Same-day Delivery</span>
                         <span><i class="fa-solid fa-weight-hanging"></i> Priced per kg</span>
                     </div>
                 </div>
@@ -3663,6 +3805,32 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Admin price panel: only shown when the page URL has ?admin=<key> -->
+    <button class="admin-fab" id="adminFab" onclick="openAdminPanel()" style="display:none;" aria-label="Edit prices" title="Edit prices">
+        <i class="fa-solid fa-gear"></i>
+    </button>
+    <div class="admin-panel-overlay" id="adminPanelOverlay" onclick="if(event.target===this)closeAdminPanel()">
+        <div class="admin-panel" role="dialog" aria-modal="true">
+            <button class="admin-close" onclick="closeAdminPanel()"><i class="fa-solid fa-xmark"></i></button>
+            <h3><i class="fa-solid fa-gear"></i> Edit Prices</h3>
+            <p class="admin-sub">Changes apply instantly on the live site for everyone — no coding needed.</p>
+            <div class="admin-field">
+                <label>Eggs — price per dozen (Rs.)</label>
+                <input type="number" id="adminEggPrice" inputmode="decimal">
+            </div>
+            <div class="admin-field">
+                <label>Live Weight meat — price per kg (Rs.)</label>
+                <input type="number" id="adminMeatLive" inputmode="decimal">
+            </div>
+            <div class="admin-field">
+                <label>Whole Fresh Meat — price per kg (Rs.)</label>
+                <input type="number" id="adminMeatWhole" inputmode="decimal">
+            </div>
+            <button class="admin-save" id="adminSaveBtn" onclick="saveAdminPrices()"><i class="fa-solid fa-floppy-disk"></i> Save Prices</button>
+            <div class="admin-status" id="adminStatus"></div>
         </div>
     </div>
 
