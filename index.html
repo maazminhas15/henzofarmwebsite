@@ -32,6 +32,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -2465,12 +2466,13 @@
                 <a href="#faq">FAQs</a>
                 <a href="#contact">Contact Us</a>
                 <a href="https://wa.me/923115190548" target="_blank" rel="noopener">WhatsApp Support</a>
-                <a href="#">Delivery Info</a>
+                <a href="#" onclick="openPolicyModal(); return false;">Privacy &amp; Refund Policy</a>
             </div>
         </div>
 
         <div class="footer-bottom">
             <p>© 2026 Henzo Farm. All rights reserved. | Premium Poultry & Organic Eggs</p>
+            <p style="margin-top:8px;"><button onclick="openAdminPanel()" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:12px;cursor:pointer;font-family:inherit;padding:0;">Admin</button></p>
         </div>
     </footer>
 
@@ -3223,7 +3225,8 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key !== 'Escape') return;
-            if (document.getElementById('adminPanelOverlay').classList.contains('open')) closeAdminPanel();
+            if (document.getElementById('policyOverlay').classList.contains('open')) closePolicyModal();
+            else if (document.getElementById('adminPanelOverlay').classList.contains('open')) closeAdminPanel();
             else if (document.getElementById('breedModalOverlay').classList.contains('open')) closeBreedModal();
             else if (document.getElementById('meatModalOverlay').classList.contains('open')) closeMeatModal();
             else if (document.getElementById('eggModalOverlay').classList.contains('open')) closeEggModal();
@@ -3462,51 +3465,95 @@
             showToast('Fresh meat added to cart!');
         }
 
-        // ==================== ADMIN PRICE PANEL ====================
-        // Change ADMIN_KEY to anything you like, then bookmark: yoursite.com/?admin=<that key>
-        const ADMIN_KEY = 'henzofarm2026';
-        function isAdminUrl() {
-            try { return new URLSearchParams(window.location.search).get('admin') === ADMIN_KEY; }
-            catch (e) { return false; }
+        // ==================== PRIVACY & REFUND POLICY ====================
+        function openPolicyModal() {
+            document.getElementById('policyOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
         }
+        function closePolicyModal() {
+            document.getElementById('policyOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // ==================== ADMIN PANEL — real login (Supabase Auth), not a secret URL ====================
+        // Writes to `settings` only succeed if Supabase Row Level Security policies require
+        // an authenticated session (see the SQL Maaz was given to run once in Supabase).
+        const sb = window.supabase ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY) : null;
+
         function openAdminPanel() {
-            document.getElementById('adminEggPrice').value = PRODUCTS.eggs.basePrice;
-            document.getElementById('adminMeatLive').value = PRODUCTS.meat[0].price;
-            document.getElementById('adminMeatWhole').value = PRODUCTS.meat[1].price;
-            document.getElementById('adminStatus').textContent = '';
+            document.getElementById('adminLoginStatus').textContent = '';
             document.getElementById('adminPanelOverlay').classList.add('open');
+            refreshAdminView();
         }
         function closeAdminPanel() {
             document.getElementById('adminPanelOverlay').classList.remove('open');
+        }
+        async function refreshAdminView() {
+            const { data } = await sb.auth.getSession();
+            const loggedIn = !!(data && data.session);
+            document.getElementById('adminLoginView').style.display = loggedIn ? 'none' : 'block';
+            document.getElementById('adminPricesView').style.display = loggedIn ? 'block' : 'none';
+            if (loggedIn) {
+                document.getElementById('adminEggPrice').value = PRODUCTS.eggs.basePrice;
+                document.getElementById('adminMeatLive').value = PRODUCTS.meat[0].price;
+                document.getElementById('adminMeatWhole').value = PRODUCTS.meat[1].price;
+                document.getElementById('adminDisc4').value = Math.round(PRODUCTS.eggs.packageDiscounts[4] * 1000) / 10;
+                document.getElementById('adminDisc5').value = Math.round(PRODUCTS.eggs.packageDiscounts[5] * 1000) / 10;
+                document.getElementById('adminStatus').textContent = '';
+            }
+        }
+        async function adminLogin() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            const status = document.getElementById('adminLoginStatus');
+            if (!sb) { status.textContent = 'Could not load the login system — check your internet and reload.'; status.className = 'admin-status err'; return; }
+            status.textContent = 'Logging in...';
+            status.className = 'admin-status';
+            const { error } = await sb.auth.signInWithPassword({ email, password });
+            if (error) {
+                status.textContent = 'Wrong email or password.';
+                status.className = 'admin-status err';
+            } else {
+                await refreshAdminView();
+            }
+        }
+        async function adminLogout() {
+            await sb.auth.signOut();
+            await refreshAdminView();
         }
         async function saveAdminPrices() {
             const eggPrice = +document.getElementById('adminEggPrice').value;
             const liveWeight = +document.getElementById('adminMeatLive').value;
             const wholeMeat = +document.getElementById('adminMeatWhole').value;
+            const disc4 = +document.getElementById('adminDisc4').value;
+            const disc5 = +document.getElementById('adminDisc5').value;
             const status = document.getElementById('adminStatus');
             const btn = document.getElementById('adminSaveBtn');
-            if (!eggPrice || !liveWeight || !wholeMeat) {
-                status.textContent = 'Please fill in all three prices.';
+            if (!eggPrice || !liveWeight || !wholeMeat || disc4 === '' || disc5 === '' || isNaN(disc4) || isNaN(disc5)) {
+                status.textContent = 'Please fill in every field.';
                 status.className = 'admin-status err';
                 return;
             }
             btn.disabled = true;
             status.textContent = 'Saving...';
             status.className = 'admin-status';
-            const ok = await supabaseUpdate('settings', '?id=eq.1', {
-                eggs_base_price: eggPrice, meat_live: liveWeight, meat_whole: wholeMeat
-            });
+            const { error } = await sb.from('settings').update({
+                eggs_base_price: eggPrice, meat_live: liveWeight, meat_whole: wholeMeat,
+                eggs_discount_4: disc4 / 100, eggs_discount_5: disc5 / 100
+            }).eq('id', 1);
             btn.disabled = false;
-            if (ok) {
+            if (!error) {
                 PRODUCTS.eggs.basePrice = eggPrice;
                 PRODUCTS.meat[0].price = liveWeight;
                 PRODUCTS.meat[1].price = wholeMeat;
+                PRODUCTS.eggs.packageDiscounts[4] = disc4 / 100;
+                PRODUCTS.eggs.packageDiscounts[5] = disc5 / 100;
                 renderAllProducts();
                 status.textContent = 'Saved! Prices are now live for everyone.';
                 status.className = 'admin-status ok';
                 setTimeout(closeAdminPanel, 1400);
             } else {
-                status.textContent = 'Could not save — check your internet connection and try again.';
+                status.textContent = 'Could not save — make sure you are logged in and online.';
                 status.className = 'admin-status err';
             }
         }
@@ -3526,6 +3573,8 @@
                 if (s.eggs_base_price) PRODUCTS.eggs.basePrice = +s.eggs_base_price;
                 if (s.meat_live) PRODUCTS.meat[0].price = +s.meat_live;
                 if (s.meat_whole) PRODUCTS.meat[1].price = +s.meat_whole;
+                if (s.eggs_discount_4 !== null && s.eggs_discount_4 !== undefined) PRODUCTS.eggs.packageDiscounts[4] = +s.eggs_discount_4;
+                if (s.eggs_discount_5 !== null && s.eggs_discount_5 !== undefined) PRODUCTS.eggs.packageDiscounts[5] = +s.eggs_discount_5;
             } // null/failed fetch — keep default prices
         }
 
@@ -3626,7 +3675,7 @@
             renderAllProducts();
             loadingEls.forEach(el => el.classList.remove('is-loading'));
             loadCampaigns();
-            if (isAdminUrl()) document.getElementById('adminFab').style.display = 'flex';
+
         });
     </script>
 
@@ -3870,29 +3919,68 @@
         </div>
     </div>
 
-    <!-- Admin price panel: only shown when the page URL has ?admin=<key> -->
-    <button class="admin-fab" id="adminFab" onclick="openAdminPanel()" style="display:none;" aria-label="Edit prices" title="Edit prices">
-        <i class="fa-solid fa-gear"></i>
-    </button>
+    <!-- Privacy & Refund Policy -->
+    <div class="checkout-overlay" id="policyOverlay" onclick="if(event.target===this)closePolicyModal()">
+        <div class="checkout-modal">
+            <button class="checkout-close" onclick="closePolicyModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h2><i class="fa-solid fa-shield-halved"></i> Privacy &amp; Refund Policy</h2>
+            <div style="font-size:14px;color:var(--text-light);line-height:1.8;max-height:60vh;overflow-y:auto;">
+                <p><strong style="color:var(--dark-green);">What we collect:</strong> Your name, phone number, delivery address and order details are used only to deliver your order and to contact you about it — nothing is sold or shared with anyone outside Henzo Farm.</p>
+                <p><strong style="color:var(--dark-green);">Freshness guarantee:</strong> If your eggs or meat arrive damaged or not fresh, message us on WhatsApp within 24 hours of delivery with a photo, and we will replace the order or refund you in full.</p>
+                <p><strong style="color:var(--dark-green);">Cancellations:</strong> Orders can be cancelled free of charge any time before they leave the farm for delivery. Once an order is out for delivery it cannot be cancelled, since it's fresh and prepared specifically for you.</p>
+                <p><strong style="color:var(--dark-green);">Pre-orders (day-old chicks):</strong> A pre-order can be cancelled any time before the hatch date for a full refund. Once chicks have hatched for your order, the sale is final.</p>
+                <p style="font-size:12px;color:var(--text-light);margin-top:16px;">Questions about this policy? Message us anytime on WhatsApp at +92 311 5190548.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin price panel: opened via the quiet "Admin" link in the footer, gated by a real login -->
     <div class="admin-panel-overlay" id="adminPanelOverlay" onclick="if(event.target===this)closeAdminPanel()">
         <div class="admin-panel" role="dialog" aria-modal="true">
             <button class="admin-close" onclick="closeAdminPanel()"><i class="fa-solid fa-xmark"></i></button>
-            <h3><i class="fa-solid fa-gear"></i> Edit Prices</h3>
-            <p class="admin-sub">Changes apply instantly on the live site for everyone — no coding needed.</p>
-            <div class="admin-field">
-                <label>Eggs — price per dozen (Rs.)</label>
-                <input type="number" id="adminEggPrice" inputmode="decimal">
+
+            <div id="adminLoginView">
+                <h3><i class="fa-solid fa-lock"></i> Admin Login</h3>
+                <p class="admin-sub">Only Maaz's login can change prices. Everyone else sees this screen.</p>
+                <div class="admin-field">
+                    <label>Email</label>
+                    <input type="email" id="adminEmail" autocomplete="username">
+                </div>
+                <div class="admin-field">
+                    <label>Password</label>
+                    <input type="password" id="adminPassword" autocomplete="current-password">
+                </div>
+                <button class="admin-save" onclick="adminLogin()"><i class="fa-solid fa-right-to-bracket"></i> Log In</button>
+                <div class="admin-status" id="adminLoginStatus"></div>
             </div>
-            <div class="admin-field">
-                <label>Live Weight meat — price per kg (Rs.)</label>
-                <input type="number" id="adminMeatLive" inputmode="decimal">
+
+            <div id="adminPricesView" style="display:none;">
+                <h3><i class="fa-solid fa-gear"></i> Edit Prices</h3>
+                <p class="admin-sub">Changes apply instantly on the live site for everyone — no coding needed.</p>
+                <div class="admin-field">
+                    <label>Eggs — price per dozen (Rs.)</label>
+                    <input type="number" id="adminEggPrice" inputmode="decimal">
+                </div>
+                <div class="admin-field">
+                    <label>Live Weight meat — price per kg (Rs.)</label>
+                    <input type="number" id="adminMeatLive" inputmode="decimal">
+                </div>
+                <div class="admin-field">
+                    <label>Whole Fresh Meat — price per kg (Rs.)</label>
+                    <input type="number" id="adminMeatWhole" inputmode="decimal">
+                </div>
+                <div class="admin-field">
+                    <label>4-dozen pack discount (%)</label>
+                    <input type="number" id="adminDisc4" inputmode="decimal" step="0.1">
+                </div>
+                <div class="admin-field">
+                    <label>5-dozen pack discount (%)</label>
+                    <input type="number" id="adminDisc5" inputmode="decimal" step="0.1">
+                </div>
+                <button class="admin-save" id="adminSaveBtn" onclick="saveAdminPrices()"><i class="fa-solid fa-floppy-disk"></i> Save Prices</button>
+                <div class="admin-status" id="adminStatus"></div>
+                <button onclick="adminLogout()" style="background:none;border:none;color:var(--text-light);font-size:12px;margin-top:14px;cursor:pointer;font-family:inherit;width:100%;">Log out</button>
             </div>
-            <div class="admin-field">
-                <label>Whole Fresh Meat — price per kg (Rs.)</label>
-                <input type="number" id="adminMeatWhole" inputmode="decimal">
-            </div>
-            <button class="admin-save" id="adminSaveBtn" onclick="saveAdminPrices()"><i class="fa-solid fa-floppy-disk"></i> Save Prices</button>
-            <div class="admin-status" id="adminStatus"></div>
         </div>
     </div>
 
