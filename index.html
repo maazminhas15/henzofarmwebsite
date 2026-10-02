@@ -12,7 +12,7 @@
     <title>Henzo Farm | Organic Pasture-Raised Eggs & Heritage Poultry in Islamabad</title>
     <meta name="description" content="Buy organic pasture-raised eggs, heritage Australorp and Rhode Island Red chickens in Islamabad. Free-range poultry farm in Islamabad. Day-old chicks, mature hens, breeding pairs.">
     <meta name="keywords" content="organic eggs Islamabad, heritage chickens Pakistan, Australorp, Rhode Island Red, RIR, free range eggs, pasture raised poultry, poultry, day old chicks, breeding pairs,farm fresh eggs">
-    <meta name="author" content="Maaz Mustafa Minhas & Furqan Mustafa Minhas">
+    <meta name="author" content="Maaz Mustafa Minhas">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph / Social Media -->
@@ -205,6 +205,10 @@
             font-size: 13px; font-weight: 600; color: var(--gold-light);
             margin-bottom: 24px; position: relative;
         }
+        .hero-ticker { cursor: pointer; font-family: inherit; transition: background 0.2s, border-color 0.2s; max-width: 100%; }
+        .hero-ticker:hover { background: rgba(201,162,39,0.25); border-color: rgba(201,162,39,0.5); }
+        .hero-ticker #heroTickerText { transition: opacity 0.25s ease; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .hero-ticker #heroTickerText.fading { opacity: 0; }
         .hero-title {
             font-size: 56px; font-weight: 800; color: var(--white);
             line-height: 1.1; margin-bottom: 20px;
@@ -1901,9 +1905,10 @@
         <div class="hero-pattern"></div>
         <div class="hero-content">
             <div data-reveal="fade-up">
-                <div class="hero-badge">
-                    <i class="fa-solid fa-leaf"></i> Premium Poultry & Organic Eggs
-                </div>
+                <button class="hero-badge hero-ticker" id="heroTicker" onclick="heroTickerClick()" aria-live="polite">
+                    <i class="fa-solid fa-leaf"></i> <span id="heroTickerText">Premium Poultry &amp; Organic Eggs</span>
+                    <i class="fa-solid fa-arrow-right" style="font-size:11px;margin-left:2px;"></i>
+                </button>
                 <h1 class="hero-title">Premium <span>Poultry</span> & Farm-Fresh <span>Eggs</span></h1>
                 <p class="hero-desc">Heritage breeds raised with care on our family farm in Islamabad. From our pasture to your plate — fresh, organic, and ethically produced.</p>
                 <div class="hero-buttons">
@@ -2106,7 +2111,7 @@
         <div class="about-container">
             <div class="about-content" data-reveal="slide-left">
                 <h2>About Henzo Farm</h2>
-                <p>Henzo Farm was founded by Maaz Mustafa Minhas & Furqan Mustafa Minhas with a simple mission: to bring back the tradition of pure, heritage poultry breeding in Islamabad.</p>
+                <p>Henzo Farm was founded by Maaz Mustafa Minhas with a simple mission: to bring back the tradition of pure, heritage poultry breeding in Islamabad.</p>
                 <p>Located in the pristine foothills of Pindorian Shareef, our farm specializes in two world-class heritage breeds — the record-breaking Black Australorp and the resilient Rhode Island Red.</p>
                 <p>From day-old chicks to mature laying hens, from breeding pairs to farm-fresh organic eggs, we deliver quality you can taste and trust. Every egg has a golden yolk. Every bird is raised with integrity.</p>
                 <div class="about-quote">"Healthy Birds. Healthy Life."</div>
@@ -2524,9 +2529,9 @@
                   alt: 'Healthy farm-raised chicken available by live weight',
                   desc: 'Select the number of birds, then choose the approximate weight of each bird. The final amount is confirmed from the actual live weight at delivery.' },
                 { id: 'whole', name: 'Whole Fresh Meat', price: 2299, unit: 'kg', emoji: '🍗',
-                  image: 'images/farm_pasture.jpg',
-                  alt: 'Fresh whole chicken prepared for delivery',
-                  desc: 'Cleaned, whole dressed birds — fresh, hygienic and ready to cook. Chilled and delivered the same day.' }
+                  image: 'images/whole_meat_cut.jpg',
+                  alt: 'Fresh chicken, cleaned and cut into pieces, ready to cook',
+                  desc: 'Cleaned and cut into 12–16 convenient pieces — fresh, hygienic and ready to cook. Chilled and delivered the same day.' }
             ]
         };
 
@@ -3198,6 +3203,41 @@
         }
 
         // ==================== SMOOTH SCROLL ====================
+        // ==================== HERO TICKER (auto-rotating category highlights) ====================
+        const HERO_TICKER_ITEMS = [
+            { text: 'Premium Poultry & Organic Eggs', section: 'eggs' },
+            { text: '🥚 Pasture-Raised Eggs — from Rs. 549/dozen', section: 'eggs' },
+            { text: '🍗 Fresh Desi Meat — Live Weight or Cut Pieces', section: 'fresh-meat' },
+            { text: '📦 5 Dozen Family Pack — 5% OFF', section: 'eggs' },
+            { text: '🐔 Heritage Chicks, Hens & Breeding Pairs', section: 'breeds' }
+        ];
+        let heroTickerIndex = 0;
+        let heroTickerTimer = null;
+        function heroTickerShow(i) {
+            const el = document.getElementById('heroTickerText');
+            if (!el) return;
+            el.classList.add('fading');
+            setTimeout(() => {
+                el.textContent = HERO_TICKER_ITEMS[i].text;
+                el.classList.remove('fading');
+            }, 250);
+        }
+        function heroTickerNext() {
+            heroTickerIndex = (heroTickerIndex + 1) % HERO_TICKER_ITEMS.length;
+            heroTickerShow(heroTickerIndex);
+        }
+        function heroTickerClick() {
+            scrollToSection(HERO_TICKER_ITEMS[heroTickerIndex].section);
+        }
+        function initHeroTicker() {
+            const btn = document.getElementById('heroTicker');
+            if (!btn) return;
+            heroTickerTimer = setInterval(heroTickerNext, 3200);
+            // pause while the visitor is reading/hovering, resume after
+            btn.addEventListener('mouseenter', () => clearInterval(heroTickerTimer));
+            btn.addEventListener('mouseleave', () => { heroTickerTimer = setInterval(heroTickerNext, 3200); });
+        }
+
         function scrollToSection(id) {
             const el = document.getElementById(id);
             if (el) {
@@ -3667,6 +3707,7 @@
             initScrollReveal();
             initCounters();
             initCookieBanner();
+            initHeroTicker();
             // dim price grids until admin prices arrive (max 1s), then render ONCE — no default→real flash
             const loadingEls = ['eggsGrid', 'freshMeatGrid'].map(id => document.getElementById(id)).filter(Boolean);
             renderAllProducts();
