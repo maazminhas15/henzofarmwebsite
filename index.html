@@ -17,10 +17,13 @@
 
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Henzo Farm | Premium Poultry & Organic Eggs">
+    <meta property="og:title" content="Henzo Farm | Pasture-Raised Eggs &amp; Fresh Desi Chicken, Islamabad">
     <meta property="og:description" content="Heritage breeds raised with care. Fresh organic eggs, day-old chicks, mature hens & breeding pairs delivered across Islamabad & Rawalpindi.">
-    <meta property="og:image" content="https://maazminhas15.github.io/henzofarm/images/logo.png">
-    <meta property="og:url" content="https://maazminhas15.github.io/henzofarm/">
+    <meta property="og:image" content="https://henzofarmwebsite-fl2v.vercel.app/images/og_image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:image" content="https://henzofarmwebsite-fl2v.vercel.app/images/og_image.jpg">
+    <meta property="og:url" content="https://henzofarmwebsite-fl2v.vercel.app/">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
@@ -28,9 +31,9 @@
     <meta name="twitter:description" content="Pasture-raised organic eggs and heritage chickens delivered fresh in Islamabad & Rawalpindi.">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://maazminhas15.github.io/henzofarm/">
+    <link rel="canonical" href="https://henzofarmwebsite-fl2v.vercel.app/">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -1643,6 +1646,20 @@
         /* ===== PRICE LOADING STATE ===== */
         .is-loading { opacity: 0.35; filter: blur(3px); pointer-events: none; transition: opacity 0.25s, filter 0.25s; min-height: 220px; }
 
+        /* ===== URDU LINES ===== */
+        .urdu-line { font-family: 'Noto Nastaliq Urdu', 'Noto Naskh Arabic', serif; direction: rtl; line-height: 2.1; width: fit-content; max-width: 100%; }
+        .hero .urdu-line { color: var(--gold-light); font-size: 17px; margin: -10px 0 26px; }
+        .section-header .urdu-line { color: var(--dark-green); font-size: 16px; margin: 6px auto 0; }
+        @media (max-width: 1024px) { .hero .urdu-line { margin: -10px auto 26px; } }
+        /* ===== REVIEW BUTTON + STARS ===== */
+        .review-cta { text-align: center; margin-top: 36px; }
+        .review-cta p { font-size: 14px; color: var(--text-light); margin-bottom: 14px; }
+        .btn-review { display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; min-height: 48px; background: var(--dark-green); color: var(--white); border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.3s; }
+        .btn-review:hover { background: var(--gold); color: var(--dark-green); }
+        .star-picker { display: flex; gap: 6px; }
+        .star-picker button { background: none; border: none; font-size: 34px; line-height: 1; color: #d9d4c7; cursor: pointer; padding: 2px; transition: transform 0.15s, color 0.15s; }
+        .star-picker button.on { color: var(--gold); }
+        .star-picker button:hover { transform: scale(1.15); }
         /* ===== DELIVERY THRESHOLD TOOLTIP ===== */
         .delivery-info {
             position: relative; display: inline-flex; align-items: center;
@@ -1674,10 +1691,11 @@
         "@type": "LocalBusiness",
         "name": "Henzo Farm",
         "description": "Organic pasture-raised eggs and heritage poultry (Australorp, Rhode Island Red, Misri) delivered fresh across Islamabad & Rawalpindi.",
-        "url": "https://maazminhas15.github.io/henzofarm/",
+        "url": "https://henzofarmwebsite-fl2v.vercel.app/",
         "telephone": "+923115190548",
         "hasMap": "https://maps.app.goo.gl/D57uHoeuGNN6aVEt5",
-        "email": "@henzofarm.com",
+        "email": "henzofarm@gmail.com",
+        "sameAs": ["https://www.instagram.com/henzo_farm/", "https://www.facebook.com/profile.php?id=61593485294735", "https://www.youtube.com/@henzofarm"],
         "priceRange": "Rs",
         "address": {
             "@type": "PostalAddress",
@@ -1698,7 +1716,7 @@
         "@context": "https://schema.org",
         "@type": "Product",
         "name": "Organic Pasture-Raised Eggs — Henzo Farm",
-        "image": "https://maazminhas15.github.io/henzofarm/images/eggs_basket.jpg",
+        "image": "https://henzofarmwebsite-fl2v.vercel.app/images/eggs_basket.jpg",
         "description": "Organic, pasture-raised eggs collected daily and delivered fresh across Islamabad & Rawalpindi.",
         "brand": { "@type": "Brand", "name": "Henzo Farm" },
         "offers": {
@@ -1716,7 +1734,7 @@
         "@context": "https://schema.org",
         "@type": "Product",
         "name": "Farm-Fresh Chicken Meat — Henzo Farm",
-        "image": "https://maazminhas15.github.io/henzofarm/images/farm_pasture.jpg",
+        "image": "https://henzofarmwebsite-fl2v.vercel.app/images/farm_pasture.jpg",
         "description": "Farm-raised chicken sold by live weight or as cleaned whole dressed meat, delivered fresh across Islamabad & Rawalpindi.",
         "brand": { "@type": "Brand", "name": "Henzo Farm" },
         "offers": {
@@ -1915,6 +1933,7 @@
                 </button>
                 <h1 class="hero-title">Premium <span>Poultry</span> & Farm-Fresh <span>Eggs</span></h1>
                 <p class="hero-desc">Heritage breeds raised with care on our family farm in Islamabad. From our pasture to your plate — fresh, organic, and ethically produced.</p>
+                <p class="urdu-line" lang="ur" dir="rtl">سیدھا فارم سے آپ کے گھر تک — تازہ دیسی انڈے اور مرغی</p>
                 <div class="hero-buttons">
                     <button class="btn-primary" onclick="openEggModal()" style="border:none;font-family:inherit;">
                         <span style="font-size:18px;">🥚</span> ORDER FRESH EGGS
@@ -1955,6 +1974,7 @@
             <div class="section-label"><i class="fa-solid fa-star"></i> Our Bestsellers</div>
             <h2 class="section-title">Organic Pasture-Raised Eggs</h2>
             <p class="section-subtitle">Golden yolks from happy, free-roaming hens</p>
+            <p class="urdu-line" lang="ur" dir="rtl">کھلی چراگاہ میں پلی مرغیوں کے خالص دیسی انڈے</p>
         </div>
 
         <div class="eggs-photos">
@@ -2005,6 +2025,7 @@
                 <div class="section-label"><i class="fa-solid fa-drumstick-bite"></i> Farm Fresh</div>
                 <h2 class="section-title">Pure Desi Chicken Meat</h2>
                 <p class="section-subtitle">Healthy, farm-raised chicken, prepared with the same care as our pasture-raised eggs.</p>
+                <p class="urdu-line" lang="ur" dir="rtl">خالص دیسی مرغی — تازہ، صاف ستھری اور فارم سے سیدھی</p>
             </div>
 
             <div class="fresh-meat-intro">
@@ -2115,7 +2136,7 @@
         <div class="about-container">
             <div class="about-content" data-reveal="slide-left">
                 <h2>About Henzo Farm</h2>
-                <p>Henzo Farm has a simple mission: to bring back the tradition of pure, heritage poultry breeding in Islamabad.</p>
+                <p>Henzo Farm was founded by Maaz Mustafa Minhas with a simple mission: to bring back the tradition of pure, heritage poultry breeding in Islamabad.</p>
                 <p>Located in the pristine foothills of Pindorian Shareef, our farm specializes in two world-class heritage breeds — the record-breaking Black Australorp and the resilient Rhode Island Red.</p>
                 <p>From day-old chicks to mature laying hens, from breeding pairs to farm-fresh organic eggs, we deliver quality you can taste and trust. Every egg has a golden yolk. Every bird is raised with integrity.</p>
                 <div class="about-quote">"Healthy Birds. Healthy Life."</div>
@@ -2232,6 +2253,10 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="review-cta">
+            <p>Ordered from Henzo Farm? We'd love to hear how it went.</p>
+            <button class="btn-review" onclick="openReviewModal()"><i class="fa-solid fa-star"></i> Write a Review</button>
         </div>
     </section>
 
@@ -2388,7 +2413,7 @@
                     <i class="fa-solid fa-envelope"></i>
                     <div>
                         <div class="label">Email</div>
-                        <div class="value">henzofarm@gmail.com</div>
+                        <div class="value"><a href="mailto:henzofarm@gmail.com" style="color:inherit;text-decoration:none;">henzofarm@gmail.com</a></div>
                     </div>
                 </div>
 
@@ -2456,10 +2481,10 @@
                 <div class="logo">HENZO <span>FARM</span></div>
                 <p>Premium poultry and organic eggs from our family farm in Islamabad. Raising heritage breeds with care since day one.</p>
                 <div class="social-links">
-                    <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=61593485294735" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/henzo_farm/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
                     <a href="https://wa.me/923115190548" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-                    <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="https://www.youtube.com/@henzofarm" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
                 </div>
             </div>
 
@@ -3278,7 +3303,8 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key !== 'Escape') return;
-            if (document.getElementById('policyOverlay').classList.contains('open')) closePolicyModal();
+            if (document.getElementById('reviewOverlay').classList.contains('open')) closeReviewModal();
+            else if (document.getElementById('policyOverlay').classList.contains('open')) closePolicyModal();
             else if (document.getElementById('breedModalOverlay').classList.contains('open')) closeBreedModal();
             else if (document.getElementById('meatModalOverlay').classList.contains('open')) closeMeatModal();
             else if (document.getElementById('eggModalOverlay').classList.contains('open')) closeEggModal();
@@ -3515,6 +3541,38 @@
             updateFloatingBar();
             closeMeatModal();
             showToast('Fresh meat added to cart!');
+        }
+
+        // ==================== REVIEWS ====================
+        let reviewRating = 0;
+        function setReviewRating(n) {
+            reviewRating = n;
+            document.querySelectorAll('#starPicker button').forEach((b, i) => b.classList.toggle('on', i < n));
+        }
+        function openReviewModal() {
+            setReviewRating(0);
+            document.getElementById('reviewOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeReviewModal() {
+            document.getElementById('reviewOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        function handleReview(e) {
+            e.preventDefault();
+            if (!reviewRating) { showToast('Please tap a star rating first'); return; }
+            const name = document.getElementById('reviewName').value.trim();
+            const city = document.getElementById('reviewCity').value.trim();
+            const text = document.getElementById('reviewText').value.trim();
+            const lines = ['⭐ *HENZO FARM REVIEW*', ''];
+            lines.push('*Rating:* ' + '★'.repeat(reviewRating) + '☆'.repeat(5 - reviewRating) + ' (' + reviewRating + '/5)');
+            lines.push('*Name:* ' + name);
+            if (city) lines.push('*City:* ' + city);
+            lines.push('*Review:* ' + text);
+            window.open('https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(lines.join('\n')), '_blank');
+            document.getElementById('reviewForm').reset();
+            closeReviewModal();
+            showToast('Thank you for your review!');
         }
 
         // ==================== PRIVACY & REFUND POLICY ====================
@@ -3886,6 +3944,40 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Write a Review -->
+    <div class="checkout-overlay" id="reviewOverlay" onclick="if(event.target===this)closeReviewModal()">
+        <div class="checkout-modal">
+            <button class="checkout-close" onclick="closeReviewModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h2><i class="fa-solid fa-star"></i> Write a Review</h2>
+            <p style="font-size:13px;color:var(--text-light);margin:-12px 0 20px;">Your review is sent to us on WhatsApp. After we check it, it is added to the website.</p>
+            <form id="reviewForm" onsubmit="handleReview(event)">
+                <div class="form-group">
+                    <label>Your Rating</label>
+                    <div class="star-picker" id="starPicker" role="radiogroup" aria-label="Rating">
+                        <button type="button" onclick="setReviewRating(1)" aria-label="1 star">★</button>
+                        <button type="button" onclick="setReviewRating(2)" aria-label="2 stars">★</button>
+                        <button type="button" onclick="setReviewRating(3)" aria-label="3 stars">★</button>
+                        <button type="button" onclick="setReviewRating(4)" aria-label="4 stars">★</button>
+                        <button type="button" onclick="setReviewRating(5)" aria-label="5 stars">★</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="reviewName" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label>City / Area (optional)</label>
+                    <input type="text" id="reviewCity" placeholder="e.g. Islamabad, F-10">
+                </div>
+                <div class="form-group">
+                    <label>Your Review</label>
+                    <textarea id="reviewText" rows="4" placeholder="What did you order? How were the eggs / meat?" required></textarea>
+                </div>
+                <button type="submit" class="btn-submit"><i class="fa-brands fa-whatsapp"></i> Send Review via WhatsApp</button>
+            </form>
         </div>
     </div>
 
